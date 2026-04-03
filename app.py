@@ -14,24 +14,22 @@ import pandas as pd
 from contextlib import asynccontextmanager
 
 from log_parser import load_all_logs
-from classifier import classify_all, get_stats
+from classifier import classify_all, classify_single, get_stats
+from datetime import datetime
 
 # ─────────────────────────────────────────────────────────────
 # Initialize & Classify on Startup
 # ─────────────────────────────────────────────────────────────
 print("\n" + "═" * 60)
-print("  🛡️  AEGISCORE DASHBOARD — SOC Alert Classification Engine")
+print("  🛡️  AEGISCORE DASHBOARD — SOC Alert Classification Engine (LIVE TRAFFIC)")
 print("═" * 60 + "\n")
 
-# Load logs at startup but defer processing to the background
-logs_df = load_all_logs()
 ALL_ALERTS = []
 STATS = {}
-RAW_LOGS = logs_df.to_dict("records")
-PROCESSING_DONE = False
+PROCESSING_DONE = True  # Setup for realtime processing
 IS_PROCESSING = False
 
-print(f"\n[AegisCore] System ready. {len(RAW_LOGS)} raw logs queued for async analysis.\n")
+print(f"\n[AegisCore] Real-time traffic sniffer ready.\n")
 
 # ─────────────────────────────────────────────────────────────
 # FastAPI App & WebSockets
@@ -88,35 +86,47 @@ manager = ConnectionManager()
 # ─────────────────────────────────────────────────────────────
 # Async Background Worker
 # ─────────────────────────────────────────────────────────────
-async def process_logs_background():
-    global ALL_ALERTS, STATS, PROCESSING_DONE, IS_PROCESSING
-    if IS_PROCESSING or PROCESSING_DONE:
-        return
-    IS_PROCESSING = True
-    batch_size = 50
-    total = len(RAW_LOGS)
+# Background processing is deprecated; Traffic intercepted in real-time via Middleware
+
+@app.middleware("http")
+async def traffic_interceptor(request: Request, call_next):
+    # Process request to simulate packet sniffing realtime
+    response = await call_next(request)
     
-    # Process logs in batches to avoid blocking the main thread
-    for i in range(0, total, batch_size):
-        batch = RAW_LOGS[i:i+batch_size]
-        batch_df = pd.DataFrame(batch)
-        new_alerts = classify_all(batch_df)
+    # Try logging traffic asynchronously to avoid blocking
+    if "api/alerts" in request.url.path or "api/stats" in request.url.path or "/ws/" in request.url.path or request.url.path in ["/styles.css", "/dashboard", "/login", "/"]:
+        # Do not log the dashboard's own API fetches
+        return response
         
-        ALL_ALERTS.extend(new_alerts)
-        STATS = get_stats(ALL_ALERTS)
+    client_ip = request.headers.get("x-simulated-ip", request.client.host if request.client else "127.0.0.1")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    content_str = f"HTTP {request.method} {request.url.path}"
+    
+    row = {
+        "id": len(ALL_ALERTS) + 1,
+        "timestamp": timestamp,
+        "source_os": request.headers.get("x-target-os", "Unknown"),
+        "component": f"{request.method} {request.url.path}",
+        "content": content_str,
+        "source_ip": client_ip,
+        "raw_headers": dict(request.headers),
+        "level": "info"
+    }
+    
+    alert = classify_single(row)
+    
+    ALL_ALERTS.insert(0, alert)  # Add at the top for real-time feed
+    if len(ALL_ALERTS) > 3000:
+        ALL_ALERTS.pop()
         
-        # Broadcast stats update and only critical/high newly discovered alerts
-        await manager.broadcast_stats(STATS)
+    global STATS
+    STATS = get_stats(ALL_ALERTS)
+    
+    asyncio.create_task(manager.broadcast_stats(STATS))
+    asyncio.create_task(manager.broadcast_alert(alert))
         
-        for alert in new_alerts:
-            if alert.get("severity") in ["Critical", "High"]:
-                await manager.broadcast_alert(alert)
-                
-        # Yield to event loop to serve other requests
-        await asyncio.sleep(0.5)
-        
-    PROCESSING_DONE = True
-    IS_PROCESSING = False
+    return response
 
 # ─────────────────────────────────────────────────────────────
 # API Endpoints
@@ -206,6 +216,17 @@ async def authenticate(request: Request):
         return JSONResponse(content={"status": "success"})
     return JSONResponse(status_code=401, content={"status": "unauthorized"})
 
+@app.get("/logout")
+def logout():
+    """Handle user logout."""
+    return RedirectResponse(url="/login", status_code=303)
+
+@app.post("/api/ingest")
+async def ingest_logs(request: Request):
+    """Handle log file ingestion."""
+    # In a real scenario, use UploadFile
+    return JSONResponse(content={"status": "success", "message": "Log ingestion started"})
+
 @app.get("/dashboard")
 def serve_dashboard():
     """Serve the main dashboard."""
@@ -213,12 +234,8 @@ def serve_dashboard():
 
 @app.post("/api/start-scan")
 async def trigger_scan():
-    """Trigger the live background analysis."""
-    global IS_PROCESSING, PROCESSING_DONE
-    if not IS_PROCESSING and not PROCESSING_DONE:
-        asyncio.create_task(process_logs_background())
-        return {"status": "started"}
-    return {"status": "already_running_or_done"}
+    """Trigger the live background analysis (Deprecated - Live natively)."""
+    return {"status": "started"}
 
 
 @app.get("/styles.css")
