@@ -1,0 +1,87 @@
+/* ═══════════════════════════════════════════════════════════
+   AegisCore Dashboard — Ultra Premium Cyber Styles
+═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+.cyber-bg {
+    background-color: #030304;
+    background-image: 
+        radial-gradient(circle at 80% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 20% 100%, rgba(220, 38, 38, 0.05) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+
+.glass-panel {
+    background: rgba(12, 12, 15, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-header {
+    background: rgba(5, 5, 7, 0.85);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-card {
+    background: rgba(18, 18, 22, 0.55);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.glass-card:hover {
+    background: rgba(28, 28, 34, 0.65);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-item {
+    display: flex; align-items: center; padding: 14px 18px; margin-bottom: 6px;
+    border-radius: 10px; color: #a1a1aa; font-weight: 600; letter-spacing: 0.1em;
+    font-size: 11px; text-transform: uppercase; transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+.sidebar-item:hover {
+    background: rgba(255, 255, 255, 0.03); color: #fff;
+}
+.sidebar-item.active {
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.15), transparent); 
+    color: #fff; border-color: rgba(37, 99, 235, 0.2);
+    box-shadow: inset 4px 0 0 #3b82f6;
+}
+
+.shadow-glow { text-shadow: 0 0 15px currentColor; }
+.glow-btn {
+    background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+.glow-btn:hover {
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+    transform: translateY(-1px);
+}
+
+.threat-radar {
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.05) inset;
+}
+.threat-radar::after, .threat-radar::before {
+    content: ""; position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    border-radius: 50%; border: 1px solid rgba(239, 68, 68, 0.6);
+    animation: ping-radar 4s cubic-bezier(0, 0, 0.2, 1) infinite; pointer-events: none;
+}
+.threat-radar::after { animation-delay: 2s; }
+
+@keyframes ping-radar {
+    0% { width: 0; height: 0; opacity: 1; }
+    100% { width: 100%; height: 100%; opacity: 0; }
+}
