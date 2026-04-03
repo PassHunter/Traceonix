@@ -1,319 +1,766 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>OpenSOC - Security Operations Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
-  <style>
-    body { font-family: 'Inter', system-ui, sans-serif; }
-    .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
-    .card-hover:hover { transform: translateY(-4px); transition: all 0.3s ease; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenSOC - Security Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(20px);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-6px);
+            transition: all 0.3s ease;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #22d3ee;
+            color: white;
+        }
+
+        .sidebar-mobile {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-mobile.open {
+            transform: translateX(0);
+        }
+
+        /* Chart improvements */
+        .chart-container {
+            position: relative;
+            height: 320px !important;
+            min-height: 320px;
+        }
+
+        canvas {
+            max-width: 100% !important;
+        }
+
+        @media (max-width: 1024px) {
+            .chart-container {
+                height: 280px !important;
+            }
+        }
+    </style>
 </head>
+
 <body class="bg-[#0a0f1c] text-slate-200 min-h-screen">
+    <div id="toast-container" class="fixed top-24 right-4 z-[100] flex flex-col gap-2 w-[320px]"></div>
 
-<div class="flex h-screen">
 
-  <!-- Sidebar -->
-  <div class="w-72 bg-[#0f172a] border-r border-slate-800 flex flex-col">
-    <div class="p-6 border-b border-slate-800">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-cyan-500 rounded-2xl flex items-center justify-center">
-          <i class="fa-solid fa-shield-halved text-black text-2xl"></i>
-        </div>
-        <div>
-          <h1 class="text-3xl font-bold tracking-tighter">SOC Analyser</h1>
-          <p class="text-xs text-slate-500 -mt-1">Community POC Edition</p>
-        </div>
-      </div>
-    </div>
+    <div class="flex h-screen overflow-hidden">
 
-    <nav class="flex-1 overflow-y-auto p-4 space-y-8">
-      <div>
-        <p class="text-xs font-semibold text-slate-500 mb-4 px-4">CORE</p>
-        <ul class="space-y-1">
-          <li><a href="#" class="flex items-center gap-3 px-4 py-3 bg-slate-800 rounded-2xl text-sm font-medium"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
-          <li><a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i class="fa-solid fa-bell"></i> Alerts <span class="ml-auto bg-red-500 text-white text-xs px-2.5 py-0.5 rounded-full">10</span></a></li>
-          <li><a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i class="fa-solid fa-triangle-exclamation"></i> Incidents <span class="ml-auto bg-red-500 text-white text-xs px-2.5 py-0.5 rounded-full">10</span></a></li>
-        </ul>
-      </div>
-
-      <div class="px-4 text-xs text-slate-500 space-y-2">
-        <p>THREAT HUNTING</p>
-        <p>ASSETS • INTELLIGENCE • ANALYTICS • MITRE ATT&CK</p>
-        <p>AUTOMATION • AI AGENTS • ORCHESTRATION</p>
-      </div>
-    </nav>
-
-    <div class="p-4 border-t border-slate-800 text-xs text-slate-500">
-      OpenSOC v0.1 POC • Pune, India
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="flex-1 flex flex-col overflow-hidden">
-
-    <!-- Top Navbar -->
-    <header class="bg-[#0f172a] border-b border-slate-800 px-8 py-4 flex items-center justify-between">
-      <div class="flex-1 max-w-xl">
-        <input type="text" id="search" 
-               class="w-full bg-slate-900 border border-slate-700 focus:border-cyan-500 rounded-3xl px-6 py-3 text-sm outline-none"
-               placeholder="Search alerts, incidents, assets..."/>
-      </div>
-
-      <div class="flex items-center gap-8">
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-          <span class="text-sm">Live</span>
-        </div>
-        
-        <button onclick="refreshDashboard()" 
-                class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-2xl text-sm transition">
-          <i class="fa-solid fa-arrows-rotate"></i> Refresh
-        </button>
-
-        <div class="flex items-center gap-4">
-          <div class="relative">
-            <i class="fa-solid fa-bell text-xl"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">3</span>
-          </div>
-          <div class="text-right">
-            <p class="text-sm font-medium">System Administrator</p>
-            <p class="text-xs text-slate-500">admin</p>
-          </div>
-          <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl flex items-center justify-center font-bold text-black">
-            SA
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <div class="flex-1 overflow-auto p-8 space-y-8">
-
-      <!-- Title -->
-      <div class="flex justify-between items-end">
-        <div>
-          <h1 class="text-3xl font-semibold">Security Operations Dashboard</h1>
-          <p class="text-slate-400 mt-1">Real-time security monitoring and incident response</p>
-        </div>
-        <div class="text-right">
-          <p class="text-sm">9:24:14 AM</p>
-          <p class="text-xs text-slate-500">Last updated: Just now</p>
-        </div>
-      </div>
-
-      <!-- KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-          <div class="flex justify-between">
-            <div>
-              <p class="text-slate-400 text-sm">Incidents Likely</p>
-              <p class="text-4xl font-bold mt-2">0</p>
-            </div>
-            <div class="text-red-500"><i class="fa-solid fa-triangle-exclamation text-3xl"></i></div>
-          </div>
-          <p class="text-xs text-slate-500 mt-6">High priority</p>
-        </div>
-
-        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-          <div class="flex justify-between">
-            <div>
-              <p class="text-slate-400 text-sm">Review Required</p>
-              <p class="text-4xl font-bold mt-2">0</p>
-            </div>
-            <div class="text-orange-500"><i class="fa-solid fa-file-lines text-3xl"></i></div>
-          </div>
-          <p class="text-xs text-slate-500 mt-6">Medium priority</p>
-        </div>
-
-        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-          <div class="flex justify-between">
-            <div>
-              <p class="text-slate-400 text-sm">Analysis Uncertain</p>
-              <p class="text-4xl font-bold mt-2">0</p>
-            </div>
-            <div class="text-yellow-500"><i class="fa-solid fa-circle-exclamation text-3xl"></i></div>
-          </div>
-          <p class="text-xs text-slate-500 mt-6">Needs review</p>
-        </div>
-
-        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-          <div class="flex justify-between">
-            <div>
-              <p class="text-slate-400 text-sm">Active Incidents</p>
-              <p class="text-4xl font-bold mt-2 text-cyan-400">67</p>
-            </div>
-            <div class="text-cyan-500"><i class="fa-solid fa-folder-open text-3xl"></i></div>
-          </div>
-          <p class="text-xs text-slate-500 mt-6">In progress</p>
-        </div>
-
-        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-          <div class="flex justify-between">
-            <div>
-              <p class="text-slate-400 text-sm">AI Triage Rate</p>
-              <p class="text-4xl font-bold mt-2 text-emerald-400">85%</p>
-            </div>
-            <div class="text-emerald-500"><i class="fa-solid fa-clock text-3xl"></i></div>
-          </div>
-          <p class="text-xs text-slate-500 mt-6">Auto Triaged</p>
-        </div>
-      </div>
-
-      <!-- Charts Row -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Alert Triage Trends -->
-        <div class="glass border border-slate-700 rounded-3xl p-6">
-          <div class="flex justify-between mb-4">
-            <h2 class="font-semibold">Alert Triage Trends</h2>
-            <span class="text-xs text-slate-500">Last 24 hours</span>
-          </div>
-          <canvas id="alertChart" height="120"></canvas>
-        </div>
-
-        <!-- Incident Trends -->
-        <div class="glass border border-slate-700 rounded-3xl p-6">
-          <div class="flex justify-between mb-4">
-            <h2 class="font-semibold">Incident Trends by Status</h2>
-            <span class="text-xs text-slate-500">Last 24 hours</span>
-          </div>
-          <canvas id="incidentChart" height="120"></canvas>
-        </div>
-      </div>
-
-      <!-- Bottom Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Infrastructure Status -->
-        <div class="lg:col-span-7 glass border border-slate-700 rounded-3xl p-6">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="font-semibold">Infrastructure Status</h2>
-            <p class="text-sm text-slate-500">30 assets monitored</p>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="infrastructure-grid">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <!-- Recent Critical Incidents -->
-        <div class="lg:col-span-5 glass border border-slate-700 rounded-3xl p-6">
-          <h2 class="font-semibold mb-6">Recent Critical Incidents</h2>
-          <div class="space-y-5">
-            <div class="bg-[#1e2937] border-l-4 border-orange-500 p-5 rounded-r-3xl">
-              <div class="flex justify-between text-sm">
-                <div>
-                  <span class="bg-orange-500/10 text-orange-400 px-3 py-1 rounded-full text-xs">SEV 4</span>
-                  <span class="ml-3 text-yellow-400 font-medium">INVESTIGATING</span>
+        <!-- Sidebar -->
+        <div id="sidebar"
+            class="w-72 bg-[#0f172a] border-r border-slate-800 flex flex-col sidebar-mobile absolute lg:relative lg:translate-x-0 h-full z-50">
+            <div class="p-6 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-black text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tighter">OpenSOC</h1>
+                        <p class="text-xs text-cyan-400 -mt-1">SOC Analyser</p>
+                    </div>
                 </div>
-                <span class="text-slate-500 text-xs">3 minutes ago</span>
-              </div>
-              <p class="mt-3 font-medium">Account privilege escalation</p>
-              <p class="text-xs text-slate-400 mt-1">Insider Threat • System Administrator</p>
             </div>
 
-            <div class="bg-[#1e2937] border-l-4 border-red-500 p-5 rounded-r-3xl">
-              <div class="flex justify-between text-sm">
-                <div>
-                  <span class="bg-red-500/10 text-red-400 px-3 py-1 rounded-full text-xs">SEV 5</span>
-                  <span class="ml-3 text-red-400 font-medium">INVESTIGATING</span>
+            <nav class="flex-1 overflow-y-auto p-4">
+                <ul class="space-y-1">
+                    <li><a href="#" onclick="switchTab(0)"
+                            class="flex items-center gap-3 px-4 py-3 bg-slate-800 rounded-2xl text-sm font-medium"><i
+                                class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+                    <li><a href="#" onclick="switchTab(1)"
+                            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i
+                                class="fa-solid fa-upload"></i> Log Ingestion</a></li>
+                    <li><a href="#" onclick="switchTab(2)"
+                            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i
+                                class="fa-solid fa-magnifying-glass"></i> Threat Analysis</a></li>
+                    <li><a href="#" onclick="switchTab(3)"
+                            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i
+                                class="fa-solid fa-chart-line"></i> Risk Scoring</a></li>
+                    <li><a href="#" onclick="switchTab(4)"
+                            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i
+                                class="fa-solid fa-file-chart-column"></i> Reports</a></li>
+                </ul>
+            </nav>
+
+            <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
+                OpenSOC v0.1 POC • Pune, India
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+
+            <!-- Top Navbar -->
+            <header class="bg-[#0f172a] border-b border-slate-800 px-4 lg:px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-2xl">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 id="page-title" class="text-2xl font-semibold">Security Operations Dashboard</h1>
                 </div>
-                <span class="text-slate-500 text-xs">12 minutes ago</span>
-              </div>
-              <p class="mt-3 font-medium">Suspicious process execution detected</p>
+
+                <div class="flex items-center gap-4 lg:gap-8">
+                    <div class="hidden sm:flex items-center gap-2">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm">Live</span>
+                    </div>
+
+                    <button onclick="refreshDashboard()"
+                        class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-2xl text-sm">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span class="hidden sm:inline">Refresh</span>
+                    </button>
+
+                    <div class="flex items-center gap-3">
+                        <div class="relative cursor-pointer"
+                            onclick="document.getElementById('bell-badge').classList.add('hidden')">
+                            <i class="fa-solid fa-bell text-xl"></i>
+                            <span id="bell-badge"
+                                class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full hidden">!</span>
+                        </div>
+                        <div class="text-right hidden md:block">
+                            <p class="text-sm font-medium">Admin</p>
+                            <p class="text-xs text-slate-500">SOC Analyst</p>
+                        </div>
+                        <div
+                            class="w-9 h-9 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl flex items-center justify-center font-bold text-black">
+                            PS
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tab Navigation -->
+            <div class="bg-[#0f172a] border-b border-slate-800 px-4 lg:px-8">
+                <div class="flex overflow-x-auto no-scrollbar gap-8 text-sm" id="tab-bar">
+                    <button onclick="switchTab(0)" class="tab-active py-4 px-2 font-medium whitespace-nowrap"
+                        id="tab-0">Dashboard</button>
+                    <button onclick="switchTab(1)"
+                        class="py-4 px-2 text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap"
+                        id="tab-1">Log Ingestion</button>
+                    <button onclick="switchTab(2)"
+                        class="py-4 px-2 text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap"
+                        id="tab-2">Threat Analysis</button>
+                    <button onclick="switchTab(3)"
+                        class="py-4 px-2 text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap"
+                        id="tab-3">Risk Scoring</button>
+                    <button onclick="switchTab(4)"
+                        class="py-4 px-2 text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap"
+                        id="tab-4">Reports</button>
+                </div>
             </div>
-          </div>
-          <button class="mt-8 text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-2">
-            View all incidents (81) <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </div>
-      </div>
 
-      <!-- Incident Workflow -->
-      <div class="glass border border-slate-700 rounded-3xl p-8 flex flex-wrap gap-8 items-center justify-between">
-        <div>
-          <p class="text-slate-400">Incident Workflow</p>
-          <p class="text-2xl font-semibold mt-2">Avg. Resolution: <span class="text-emerald-400">4.2h</span></p>
+            <!-- Tab Content -->
+            <div class="flex-1 overflow-auto p-4 lg:p-8" id="content-area">
+
+                <!-- DASHBOARD TAB -->
+                <div id="content-0">
+                    <div class="flex justify-between items-end mb-8">
+                        <div>
+                            <h1 class="text-3xl font-semibold">Security Operations Dashboard</h1>
+                            <p class="text-slate-400">Real-time monitoring and incident response</p>
+                        </div>
+                        <div class="text-right text-sm">
+                            <p id="current-time"></p>
+                            <p class="text-xs text-slate-500">Last updated: <span id="last-updated">Just now</span></p>
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
+                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
+                            <p class="text-slate-400 text-sm">Critical Incidents</p>
+                            <p class="text-4xl font-bold mt-2 text-red-400" id="stat-critical">0</p>
+                            <p class="text-xs text-slate-500 mt-6">High priority</p>
+                        </div>
+                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
+                            <p class="text-slate-400 text-sm">Review Required</p>
+                            <p class="text-4xl font-bold mt-2 text-orange-400" id="stat-review">0</p>
+                            <p class="text-xs text-slate-500 mt-6">Medium priority</p>
+                        </div>
+                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
+                            <p class="text-slate-400 text-sm">Uncertain Alerts</p>
+                            <p class="text-4xl font-bold mt-2 text-yellow-400" id="stat-suspicious">0</p>
+                            <p class="text-xs text-slate-500 mt-6">Needs review</p>
+                        </div>
+                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
+                            <p class="text-slate-400 text-sm">Active Incidents</p>
+                            <p class="text-4xl font-bold mt-2 text-cyan-400" id="stat-total">0</p>
+                            <p class="text-xs text-slate-500 mt-6">In progress</p>
+                        </div>
+                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
+                            <p class="text-slate-400 text-sm">AI Triage Rate</p>
+                            <p class="text-4xl font-bold mt-2 text-emerald-400">87%</p>
+                            <p class="text-xs text-slate-500 mt-6">Auto Triaged</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts with better size -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                        <div class="glass border border-slate-700 rounded-3xl p-6">
+                            <h2 class="font-semibold mb-4">Alert Triage Trends (Last 7 Hours)</h2>
+                            <div class="chart-container">
+                                <canvas id="alertChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="glass border border-slate-700 rounded-3xl p-6">
+                            <h2 class="font-semibold mb-4">Incident Trends (Last 7 Hours)</h2>
+                            <div class="chart-container">
+                                <canvas id="incidentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Infrastructure & Recent Incidents -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
+                        <div class="lg:col-span-7 glass border border-slate-700 rounded-3xl p-6">
+                            <h2 class="font-semibold mb-6">Infrastructure Status</h2>
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="infrastructure-grid">
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 glass border border-slate-700 rounded-3xl p-6">
+                            <h2 class="font-semibold mb-6">Recent Critical Incidents</h2>
+                            <div class="space-y-5" id="recent-incidents-container">
+                                <div class="bg-[#1e2937] border-l-4 border-orange-500 p-5 rounded-r-3xl">
+                                    <p class="font-medium">Account privilege escalation</p>
+                                    <p class="text-xs text-slate-400 mt-1">Insider Threat • 3 min ago</p>
+                                </div>
+                                <div class="bg-[#1e2937] border-l-4 border-red-500 p-5 rounded-r-3xl">
+                                    <p class="font-medium">Suspicious process execution</p>
+                                    <p class="text-xs text-slate-400 mt-1">SRV-IT-02 • 12 min ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Tabs -->
+                <div id="content-1" class="hidden">
+                    <h1 class="text-3xl font-semibold mb-6">Log Ingestion</h1>
+                    <div class="glass border border-slate-700 rounded-3xl p-8 text-center">
+                        <i class="fa-solid fa-upload text-6xl text-cyan-400 mb-6"></i>
+                        <p class="text-2xl font-medium">Log Ingestion Pipeline</p>
+                        <p class="text-slate-400 mt-4">Connect sources • Monitor ingestion rate • View parsing errors
+                        </p>
+                        <button
+                            class="mt-8 bg-cyan-500 hover:bg-cyan-600 text-black font-medium px-8 py-3 rounded-2xl">Add
+                            New Log Source</button>
+                    </div>
+                </div>
+
+                <div id="content-2" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-semibold">Threat Analysis Log</h1>
+                        <div class="relative w-96">
+                            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                            <input type="text" id="quick-search" placeholder="Search signals (e.g. root, malware)" oninput="handleSearch()" class="w-full bg-slate-900 border border-slate-700 rounded-full py-2.5 pl-11 pr-4 text-sm text-slate-200 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all placeholder-slate-500">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="filterAlerts('all', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-cyan-600 text-black shadow-lg">ALL</button>
+                        <button onclick="filterAlerts('Critical', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">CRITICAL</button>
+                        <button onclick="filterAlerts('High', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">HIGH</button>
+                        <button onclick="filterAlerts('Medium', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">MEDIUM</button>
+                        <button onclick="filterAlerts('Low', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">LOW</button>
+                    </div>
+            
+                    <div class="glass border border-slate-700 rounded-3xl overflow-hidden h-[600px] flex flex-col">
+                        <div class="overflow-y-auto custom-scrollbar flex-1">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="sticky top-0 bg-[#0f172a] shadow-md z-10 text-xs text-slate-400 uppercase tracking-wider">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold border-b border-slate-700">ID</th>
+                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">TIME</th>
+                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">SOURCE</th>
+                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">SEVERITY</th>
+                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">CATEGORY</th>
+                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">SUMMARY</th>
+                                        <th class="px-6 py-4 font-semibold border-b border-slate-700 text-right">RISK</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alert-tbody" class="text-sm divide-y divide-slate-800">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-3" class="hidden">
+                    <h1 class="text-3xl font-semibold mb-6">Risk Scoring & Attack Vectors</h1>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                            <div class="absolute top-4 left-6 text-xs font-bold tracking-widest text-cyan-500 z-10 shadow-glow">NETWORK SPIDER</div>
+                            <div class="absolute top-4 right-6 text-[9px] text-zinc-500 z-10 w-2 h-2 rounded-full bg-cyan-500 animate-ping"></div>
+                            <div class="relative w-full h-[300px] flex items-center justify-center pt-8">
+                                <canvas id="chart-radar"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
+                            <div class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">THREAT CATEGORY</div>
+                            <div class="relative w-full h-[300px] flex items-center justify-center pt-8">
+                                <canvas id="chart-category"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
+                            <div class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">THREAT SEVERITY</div>
+                            <div class="relative w-full h-[300px] flex items-center justify-center pt-8">
+                                <canvas id="chart-severity"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
+                            <div class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">OS DISTRIBUTION</div>
+                            <div class="relative w-full h-[300px] flex items-center justify-center pt-8">
+                                <canvas id="chart-os"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-4" class="hidden">
+                    <h1 class="text-3xl font-semibold mb-6">Reports Engine</h1>
+                    <div class="glass border border-slate-700 rounded-3xl p-8 max-w-2xl">
+                        <i class="fa-solid fa-file-pdf text-6xl text-red-500 mb-6 block text-center"></i>
+                        <h2 class="text-2xl font-medium text-center text-white mb-4">Export Incident Report</h2>
+                        <p class="text-slate-400 text-center mb-8">Generate a formal PDF document containing the most recent Critical alerts spanning the active timeframe. Can be sent to legal and management teams.</p>
+                        <div class="flex justify-center">
+                            <button onclick="exportPDF()" class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 text-white font-semibold px-8 py-3 rounded-2xl flex items-center gap-3 transition-all shadow-lg shadow-red-500/20 active:scale-95">
+                                <i class="fa-solid fa-print"></i> Generate PDF Document
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-        <div class="text-center">
-          <p class="text-3xl font-bold">5</p>
-          <p class="text-sm text-slate-400">Active Analysts</p>
-        </div>
-        <div>
-          <p class="text-5xl font-bold text-cyan-400">81</p>
-          <p class="text-xs text-slate-500">Total Incidents</p>
-        </div>
-      </div>
     </div>
-  </div>
-</div>
 
-<script>
-// Tailwind Script already included via CDN
+    <script>
+        // Chart instances
+        let currentTab = 0;
+        let alertChartInstance = null;
+        let incidentChartInstance = null;
 
-// Infrastructure Assets
-const assets = [
-  {name: "WS-HR-01", type: "Workstation", ip: "10.8.2.181", status: "green"},
-  {name: "SRV-IT-02", type: "Server", ip: "10.8.1.191", status: "gray"},
-  {name: "MOBILE-FIELD OPERATION...", type: "Mobile", ip: "10.8.2.50", status: "yellow"},
-  {name: "IOT-FACILITIES-04", type: "IoT Device", ip: "10.8.3.33", status: "gray"},
-  {name: "WS-LEGAL-05", type: "Workstation", ip: "10.8.2.34", status: "yellow"},
-  {name: "WS-LEGAL-03", type: "Workstation", ip: "10.8.2.34", status: "gray"},
-  {name: "MOBILE-EXECUTIVE-11", type: "Mobile", ip: "10.8.2.88", status: "gray"},
-  {name: "SRV-IT-10", type: "Server", ip: "10.8.1.36", status: "gray"},
-];
+        function switchTab(tabIndex) {
+            currentTab = tabIndex;
 
-const grid = document.getElementById('infrastructure-grid');
-assets.forEach(asset => {
-  grid.innerHTML += `
-    <div class="bg-[#1e2937] border border-slate-700 rounded-2xl p-4 hover:border-cyan-500/50 transition-all">
-      <div class="flex justify-between items-start">
+            for (let i = 0; i < 5; i++) {
+                const content = document.getElementById(`content-${i}`);
+                if (content) content.classList.toggle('hidden', i !== tabIndex);
+
+                const tab = document.getElementById(`tab-${i}`);
+                if (tab) tab.classList.toggle('tab-active', i === tabIndex);
+            }
+
+            const titles = [
+                "Security Operations Dashboard",
+                "Log Ingestion",
+                "Threat Analysis",
+                "Risk Scoring",
+                "Reports"
+            ];
+            document.getElementById('page-title').textContent = titles[tabIndex];
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        document.addEventListener('click', function (e) {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth < 1024 && !sidebar.contains(e.target) && !e.target.closest('button')) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Infrastructure Grid
+        const assets = [
+            { name: "WS-HR-01", type: "Workstation", ip: "10.8.2.181", status: "green" },
+            { name: "SRV-IT-02", type: "Server", ip: "10.8.1.191", status: "gray" },
+            { name: "MOBILE-FIELD-07", type: "Mobile", ip: "10.8.2.50", status: "yellow" },
+            { name: "IOT-FAC-04", type: "IoT", ip: "10.8.3.33", status: "gray" },
+            { name: "WS-LEGAL-05", type: "Workstation", ip: "10.8.2.34", status: "yellow" },
+            { name: "WS-LEGAL-03", type: "Workstation", ip: "10.8.2.35", status: "green" },
+        ];
+
+        const grid = document.getElementById('infrastructure-grid');
+        grid.innerHTML = '';
+        assets.forEach(asset => {
+            const color = asset.status === 'green' ? 'emerald' : asset.status === 'yellow' ? 'amber' : 'slate';
+            grid.innerHTML += `
+    <div class="bg-[#1e2937] border border-slate-700 rounded-2xl p-4 hover:border-cyan-500 transition-all">
+      <div class="flex justify-between">
         <div>
           <p class="font-mono text-sm">${asset.name}</p>
           <p class="text-xs text-slate-500">${asset.type}</p>
         </div>
-        <div class="w-3 h-3 rounded-full bg-${asset.status}-500"></div>
+        <div class="w-3 h-3 rounded-full bg-${color}-500 mt-1"></div>
       </div>
       <p class="font-mono text-xs text-slate-500 mt-6">${asset.ip}</p>
     </div>
   `;
-});
+        });
 
-// Charts
-const alertCtx = document.getElementById('alertChart').getContext('2d');
-new Chart(alertCtx, {
-  type: 'line',
-  data: {
-    labels: ['10:05','12:05','14:05','16:05','18:05','20:05','22:05','00:05','02:05'],
-    datasets: [
-      { label: 'Critical', data: [0,0,0,0,0,0,0,5,8], borderColor: '#ef4444', tension: 0.4, fill: true, backgroundColor: 'rgba(239,68,68,0.1)' },
-      { label: 'High', data: [0,0,0,0,0,0,2,6,7], borderColor: '#f97316', tension: 0.4, fill: true, backgroundColor: 'rgba(249,115,22,0.1)' },
-      { label: 'Total', data: [0,0,0,0,0,0,3,15,23], borderColor: '#22d3ee', borderWidth: 3, tension: 0.4 }
-    ]
-  },
-  options: { responsive: true, plugins: { legend: { position: 'top', labels: { color: '#e2e8f0' } } }, scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } } }
-});
+        // Helper functions
+        function getTimeLabels() {
+            const labels = [];
+            const now = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const t = new Date(now.getTime() - i * 60 * 60 * 1000);
+                labels.push(t.getHours() + ":00");
+            }
+            return labels;
+        }
 
-const incidentCtx = document.getElementById('incidentChart').getContext('2d');
-new Chart(incidentCtx, {
-  type: 'line',
-  data: {
-    labels: ['10:05','12:05','14:05','16:05','18:05','20:05','22:05','00:05','02:05'],
-    datasets: [
-      { label: 'Open', data: [0,0,0,0,0,0,1,3,4], borderColor: '#ef4444', tension: 0.4 },
-      { label: 'Investigating', data: [0,0,0,0,0,0,2,5,7], borderColor: '#f97316', tension: 0.4 },
-      { label: 'Total', data: [0,0,0,0,0,0,3,9,14], borderColor: '#22d3ee', borderWidth: 3, tension: 0.4 }
-    ]
-  },
-  options: { responsive: true, plugins: { legend: { position: 'top', labels: { color: '#e2e8f0' } } }, scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } } }
-});
+        function generateData(base, variance) {
+            return Array.from({ length: 7 }, () => Math.floor(base + Math.random() * variance));
+        }
 
-// Refresh function
-function refreshDashboard() {
-  alert("Dashboard refreshed! (In real app this would fetch new data)");
+        // Update Charts
+        function updateCharts() {
+            const labels = getTimeLabels();
+
+            if (alertChartInstance) alertChartInstance.destroy();
+            if (incidentChartInstance) incidentChartInstance.destroy();
+
+            // Alert Triage Trends
+            alertChartInstance = new Chart(document.getElementById('alertChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Critical', data: generateData(5, 12), borderColor: '#ef4444', tension: 0.4, borderWidth: 3 },
+                        { label: 'High', data: generateData(12, 15), borderColor: '#f97316', tension: 0.4 },
+                        { label: 'Total', data: generateData(45, 35), borderColor: '#22d3ee', borderWidth: 4, tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 800 },
+                    scales: {
+                        y: { grid: { color: '#334155' } },
+                        x: { grid: { color: '#334155' } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', align: 'end', labels: { color: '#cbd5e1' } }
+                    }
+                }
+            });
+
+            // Incident Trends
+            incidentChartInstance = new Chart(document.getElementById('incidentChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Open', data: generateData(4, 8), borderColor: '#ef4444', tension: 0.4, borderWidth: 3 },
+                        { label: 'Investigating', data: generateData(10, 12), borderColor: '#f97316', tension: 0.4 },
+                        { label: 'Total', data: generateData(30, 25), borderColor: '#22d3ee', borderWidth: 4, tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 800 },
+                    scales: {
+                        y: { grid: { color: '#334155' } },
+                        x: { grid: { color: '#334155' } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', align: 'end', labels: { color: '#cbd5e1' } }
+                    }
+                }
+            });
+
+            document.getElementById('last-updated').textContent = "Just now";
+        }
+
+        // Auto refresh every 60 seconds
+        setInterval(updateCharts, 60000);
+
+        // Manual Refresh
+        function refreshDashboard() {
+            updateCharts();
+            alert("Dashboard refreshed with latest security data!");
+        }
+
+        // Live Time
+        function updateTime() {
+            setInterval(() => {
+                const timeEl = document.getElementById('current-time');
+                timeEl.textContent = new Date().toLocaleTimeString('en-US', {
+                    hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
+                });
+            }, 1000);
+        }
+
+        // Initialize
+        window.onload = () => {
+            updateTime();
+            updateCharts();
+        };
+
+        // -----------------------------------------
+        // WebSocket & Real-time Alerts Integration
+        // -----------------------------------------
+        
+let currentFilter = 'all';
+let searchQuery = '';
+let chartCategory = null;
+let chartSeverity = null;
+let chartOS = null;
+let chartRadar = null;
+
+function renderAlerts() {
+    const tb = document.getElementById('alert-tbody');
+    if(!tb) return;
+    tb.innerHTML = '';
+    let q = searchQuery.toLowerCase();
+    allAlerts.filter(a => (currentFilter==='all' || a.severity===currentFilter) && 
+        (q==='' || a.summary.toLowerCase().includes(q) || a.category.toLowerCase().includes(q) || a.source_os.toLowerCase().includes(q)))
+        .slice(0, 100).forEach(a => {
+            let sCol = a.severity==='Critical'?'text-red-400 border-red-500/30 bg-red-500/10'
+                     :a.severity==='High'?'text-orange-400 border-orange-500/30 bg-orange-500/10'
+                     :a.severity==='Medium'?'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'
+                     :'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+                     
+            let rColor = a.risk_score>=80?'#ef4444':a.risk_score>=60?'#f97316':a.risk_score>=40?'#eab308':'#10b981';
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-[#1e2937] transition-colors";
+            tr.innerHTML = `
+                <td class="px-6 py-3 border-none">#${a.id}</td>
+                <td class="px-4 py-3 border-none text-slate-400">${a.timestamp.split(' ')[1]}</td>
+                <td class="px-4 py-3 border-none"><span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px] border border-slate-700">${a.source_os}</span></td>
+                <td class="px-4 py-3 border-none"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${sCol}">${a.severity.toUpperCase()}</span></td>
+                <td class="px-4 py-3 border-none text-slate-400 text-xs">${a.category}</td>
+                <td class="px-4 py-3 border-none text-slate-200 truncate max-w-[250px]" title="${a.summary}">${a.summary}</td>
+                <td class="px-6 py-3 border-none flex items-center justify-end gap-2">
+                    <span class="inline-block w-20 h-1.5 rounded-full bg-slate-800 overflow-hidden relative">
+                        <span class="absolute top-0 left-0 h-full" style="width: ${a.risk_score}%; background: ${rColor}; box-shadow: 0 0 10px ${rColor}"></span>
+                    </span>
+                    <span class="text-xs w-6 text-right font-mono" style="color: ${rColor}">${a.risk_score}</span>
+                </td>
+            `;
+            tb.appendChild(tr);
+        });
 }
-</script>
+
+function filterAlerts(f, e) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => { 
+        b.classList.remove('bg-cyan-600', 'text-black'); 
+        b.classList.add('bg-transparent', 'text-slate-400', 'border-slate-700'); 
+    });
+    e.classList.remove('bg-transparent', 'text-slate-400', 'border-slate-700');
+    e.classList.add('bg-cyan-600', 'text-black');
+    renderAlerts();
+}
+
+function handleSearch() { 
+    searchQuery = document.getElementById('quick-search').value; 
+    renderAlerts(); 
+}
+
+function exportPDF() {
+    if (!window.jspdf) { alert("PDF library loading."); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(220, 38, 38);
+    doc.text("OpenSOC - Incident Report", 14, 20);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Generated: " + new Date().toLocaleString(), 14, 28);
+    
+    const last10 = recentCriticalAlerts.slice(0, 15);
+    if (last10.length === 0) doc.text("No critical alerts recorded.", 14, 40);
+    else {
+        doc.autoTable({
+            startY: 35,
+            head: [['Time', 'OS', 'Category', 'Summary', 'Risk']],
+            body: last10.map(a => [a.timestamp.split(' ')[1], a.source_os, a.category, a.summary, a.risk_score]),
+            theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [220, 38, 38] }
+        });
+    }
+    doc.save("OpenSOC_Export.pdf");
+}
+
+function initDashboardCharts() {
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = 'Inter';
+    const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {color: '#cbd5e1'} } }, borderDash: [5,5] };
+    
+    // Doughnut 1
+    const elCat = document.getElementById('chart-category');
+    if(elCat) {
+        chartCategory = new Chart(elCat, {
+            type: 'doughnut',
+            data: { labels: ['Malicious','Suspicious','Benign'], datasets: [{ data:[0,0,0], backgroundColor: ['#ef4444','#f97316','#10b981'], borderWidth:0 }] },
+            options: { ...opts, cutout: '75%' }
+        });
+    }
+    // Bar
+    const elSev = document.getElementById('chart-severity');
+    if(elSev) {
+        chartSeverity = new Chart(elSev, {
+            type: 'bar',
+            data: { labels: ['Critical','High','Medium','Low'], datasets: [{ label: 'Events', data:[0,0,0,0], backgroundColor: ['#ef4444','#f97316','#eab308','#10b981'], borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: {color: '#1e2937'} }, x: { grid: {display: false} } } }
+        });
+    }
+    // Doughnut 2
+    const elOS = document.getElementById('chart-os');
+    if(elOS) {
+        chartOS = new Chart(elOS, {
+            type: 'doughnut',
+            data: { labels: ['Linux','Windows','macOS'], datasets: [{ data:[0,0,0], backgroundColor: ['#eab308','#3b82f6','#94a3b8'], borderWidth:0 }] },
+            options: { ...opts, cutout: '75%' }
+        });
+    }
+    // Radar
+    const elRad = document.getElementById('chart-radar');
+    if(elRad) {
+        chartRadar = new Chart(elRad, {
+            type: 'radar',
+            data: {
+                labels: ['Critical', 'High', 'Malicious', 'Suspicious', 'Windows', 'Linux'],
+                datasets: [{
+                    label: 'Network Flow',
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: 'rgba(34, 211, 238, 0.2)',
+                    borderColor: '#22d3ee',
+                    pointBackgroundColor: '#22d3ee',
+                    borderWidth: 1.5,
+                    pointRadius: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        pointLabels: { color: '#94a3b8', font: {size: 10} },
+                        ticks: { display: false }
+                    }
+                }
+            }
+        });
+    }
+}
+
+let allAlerts = [];
+        let recentCriticalAlerts = [];
+        let recentNotifications = {};
+
+        function showToast(alert) {
+            let isCrit = alert.severity === 'Critical';
+            let bg = isCrit ? 'bg-red-950/90 border-red-500/50 text-red-100' : 'bg-slate-800 border-slate-700 text-slate-300 shadow-xl border';
+
+            const t = document.createElement('div');
+            t.className = `p-4 rounded-xl border backdrop-blur-md transition-all translate-x-[150%] duration-500 ${bg}`;
+            t.innerHTML = `
+        <div class="text-[10px] font-bold tracking-widest mb-1 ${isCrit ? 'text-red-400' : 'text-cyan-400'}">${alert.severity.toUpperCase()} DETECTED</div>
+        <div class="text-sm font-medium leading-tight">${alert.summary}</div>
+    `;
+            document.getElementById('toast-container').prepend(t);
+            requestAnimationFrame(() => t.style.transform = 'translateX(0)');
+            setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.remove(), 500); }, isCrit ? 8000 : 4000);
+        }
+
+        function renderRecentCritical() {
+            const container = document.getElementById('recent-incidents-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            recentCriticalAlerts.slice(0, 5).forEach(a => {
+                let borderColor = a.severity === 'Critical' ? 'border-red-500' : 'border-orange-500';
+                container.innerHTML += `
+              <div class="bg-[#1e2937] border-l-4 ${borderColor} p-5 rounded-r-3xl transition-all">
+                <p class="font-medium text-slate-200">${a.summary}</p>
+                <p class="text-xs text-slate-400 mt-1">${a.category} • ${a.timestamp.split(' ')[1]}</p>
+              </div>
+        `;
+            });
+        }
+
+        function initWebsocket() {
+            const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/alerts`);
+            ws.onmessage = e => {
+                const m = JSON.parse(e.data);
+                if (m.type === 'stats') {
+                    const elTotal = document.getElementById('stat-total');
+                    const elCrit = document.getElementById('stat-critical');
+                    const elSusp = document.getElementById('stat-suspicious');
+                    const elReview = document.getElementById('stat-review');
+
+                    if (elTotal) elTotal.textContent = (m.data.total || 0).toLocaleString();
+                    if (elCrit) elCrit.textContent = ((m.data.severity?.['Critical'] || 0) + (m.data.severity?.['High'] || 0)).toLocaleString();
+                    if (elSusp) elSusp.textContent = (m.data.categories?.['Suspicious'] || 0).toLocaleString();
+                    if (elReview) elReview.textContent = (m.data.categories?.['Malicious'] || 0).toLocaleString();
+                }
+                else if (m.type === 'alert') {
+                    allAlerts.unshift(m.data);
+                    if (allAlerts.length > 2000) allAlerts.pop();
+
+                    if (m.data.severity === 'Critical' || m.data.severity === 'High') {
+                        recentCriticalAlerts.unshift(m.data);
+                        if (recentCriticalAlerts.length > 20) recentCriticalAlerts.pop();
+                        renderRecentCritical();
+                    }
+
+                    const alertKey = m.data.summary || m.data.category;
+                    const now = Date.now();
+                    if (!recentNotifications[alertKey] || (now - recentNotifications[alertKey] > 10000)) {
+                        recentNotifications[alertKey] = now;
+                        showToast(m.data);
+                        const badge = document.getElementById('bell-badge');
+                        if (badge) badge.classList.remove('hidden');
+                    }
+                }
+            };
+        }
+        // Hook into original window.onload if it exists
+        const originalOnLoad = window.onload;
+        window.onload = () => {
+            if (originalOnLoad) originalOnLoad();
+            initWebsocket();
+        };
+
+    </script>
 
 </body>
+
 </html>
