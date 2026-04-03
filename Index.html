@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OpenSOC - Security Operations</title>
+    <title>AegisCore Dashboard - Security Operations</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 
     <style>
@@ -77,8 +77,8 @@
                         <i class="fa-solid fa-shield-halved text-black text-3xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-3xl font-bold tracking-tighter">OpenSOC</h1>
-                        <p class="text-xs text-cyan-400 -mt-1">SOC Analyser</p>
+                        <h1 class="text-3xl font-bold tracking-tighter">AegisCore Dashboard</h1>
+                        <p class="text-xs text-cyan-400 -mt-1"></p>
                     </div>
                 </div>
             </div>
@@ -104,7 +104,7 @@
             </nav>
 
             <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
-                OpenSOC v0.1 POC • Pune, India
+                AegisCore Dashboard v0.1 POC • Pune, India
             </div>
         </div>
 
@@ -145,7 +145,7 @@
                         </div>
                         <div
                             class="w-9 h-9 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl flex items-center justify-center font-bold text-black">
-                            PS
+                            Ad
                         </div>
                     </div>
                 </div>
@@ -211,7 +211,7 @@
                         </div>
                         <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
                             <p class="text-slate-400 text-sm">AI Triage Rate</p>
-                            <p class="text-4xl font-bold mt-2 text-emerald-400">87%</p>
+                            <p class="text-4xl font-bold mt-2 text-emerald-400" id="stat-triage">87%</p>
                             <p class="text-xs text-slate-500 mt-6">Auto Triaged</p>
                         </div>
                     </div>
@@ -275,22 +275,30 @@
                         <h1 class="text-3xl font-semibold">Threat Analysis Log</h1>
                         <div class="relative w-96">
                             <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                            <input type="text" id="quick-search" placeholder="Search signals (e.g. root, malware)" oninput="handleSearch()" class="w-full bg-slate-900 border border-slate-700 rounded-full py-2.5 pl-11 pr-4 text-sm text-slate-200 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all placeholder-slate-500">
+                            <input type="text" id="quick-search" placeholder="Search signals (e.g. root, malware)"
+                                oninput="handleSearch()"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-full py-2.5 pl-11 pr-4 text-sm text-slate-200 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all placeholder-slate-500">
                         </div>
                     </div>
-                    
+
                     <div class="flex gap-4 mb-6">
-                        <button onclick="filterAlerts('all', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-cyan-600 text-black shadow-lg">ALL</button>
-                        <button onclick="filterAlerts('Critical', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">CRITICAL</button>
-                        <button onclick="filterAlerts('High', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">HIGH</button>
-                        <button onclick="filterAlerts('Medium', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">MEDIUM</button>
-                        <button onclick="filterAlerts('Low', this)" class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">LOW</button>
+                        <button onclick="filterAlerts('all', this)"
+                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-cyan-600 text-black shadow-lg">ALL</button>
+                        <button onclick="filterAlerts('Critical', this)"
+                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">CRITICAL</button>
+                        <button onclick="filterAlerts('High', this)"
+                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">HIGH</button>
+                        <button onclick="filterAlerts('Medium', this)"
+                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">MEDIUM</button>
+                        <button onclick="filterAlerts('Low', this)"
+                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">LOW</button>
                     </div>
-            
+
                     <div class="glass border border-slate-700 rounded-3xl overflow-hidden h-[600px] flex flex-col">
                         <div class="overflow-y-auto custom-scrollbar flex-1">
                             <table class="w-full text-left border-collapse">
-                                <thead class="sticky top-0 bg-[#0f172a] shadow-md z-10 text-xs text-slate-400 uppercase tracking-wider">
+                                <thead
+                                    class="sticky top-0 bg-[#0f172a] shadow-md z-10 text-xs text-slate-400 uppercase tracking-wider">
                                     <tr>
                                         <th class="px-6 py-4 font-semibold border-b border-slate-700">ID</th>
                                         <th class="px-4 py-4 font-semibold border-b border-slate-700">TIME</th>
@@ -298,7 +306,8 @@
                                         <th class="px-4 py-4 font-semibold border-b border-slate-700">SEVERITY</th>
                                         <th class="px-4 py-4 font-semibold border-b border-slate-700">CATEGORY</th>
                                         <th class="px-4 py-4 font-semibold border-b border-slate-700">SUMMARY</th>
-                                        <th class="px-6 py-4 font-semibold border-b border-slate-700 text-right">RISK</th>
+                                        <th class="px-6 py-4 font-semibold border-b border-slate-700 text-right">RISK
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="alert-tbody" class="text-sm divide-y divide-slate-800">
@@ -310,32 +319,46 @@
 
                 <div id="content-3" class="hidden">
                     <h1 class="text-3xl font-semibold mb-6">Risk Scoring & Attack Vectors</h1>
-                    
+
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
-                            <div class="absolute top-4 left-6 text-xs font-bold tracking-widest text-cyan-500 z-10 shadow-glow">NETWORK SPIDER</div>
-                            <div class="absolute top-4 right-6 text-[9px] text-zinc-500 z-10 w-2 h-2 rounded-full bg-cyan-500 animate-ping"></div>
+                        <div
+                            class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                            <div
+                                class="absolute top-4 left-6 text-xs font-bold tracking-widest text-cyan-500 z-10 shadow-glow">
+                                NETWORK SPIDER</div>
+                            <div
+                                class="absolute top-4 right-6 text-[9px] text-zinc-500 z-10 w-2 h-2 rounded-full bg-cyan-500 animate-ping">
+                            </div>
                             <div class="relative w-full h-[300px] flex items-center justify-center pt-8">
                                 <canvas id="chart-radar"></canvas>
                             </div>
                         </div>
-                        
-                        <div class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
-                            <div class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">THREAT CATEGORY</div>
+
+                        <div
+                            class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
+                            <div
+                                class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">
+                                THREAT CATEGORY</div>
                             <div class="relative w-full h-[300px] flex items-center justify-center pt-8">
                                 <canvas id="chart-category"></canvas>
                             </div>
                         </div>
-                        
-                        <div class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
-                            <div class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">THREAT SEVERITY</div>
+
+                        <div
+                            class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
+                            <div
+                                class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">
+                                THREAT SEVERITY</div>
                             <div class="relative w-full h-[300px] flex items-center justify-center pt-8">
                                 <canvas id="chart-severity"></canvas>
                             </div>
                         </div>
-                        
-                        <div class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
-                            <div class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">OS DISTRIBUTION</div>
+
+                        <div
+                            class="glass border border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center relative">
+                            <div
+                                class="absolute top-4 left-6 text-xs font-bold tracking-widest text-slate-400 shadow-glow">
+                                OS DISTRIBUTION</div>
                             <div class="relative w-full h-[300px] flex items-center justify-center pt-8">
                                 <canvas id="chart-os"></canvas>
                             </div>
@@ -348,9 +371,12 @@
                     <div class="glass border border-slate-700 rounded-3xl p-8 max-w-2xl">
                         <i class="fa-solid fa-file-pdf text-6xl text-red-500 mb-6 block text-center"></i>
                         <h2 class="text-2xl font-medium text-center text-white mb-4">Export Incident Report</h2>
-                        <p class="text-slate-400 text-center mb-8">Generate a formal PDF document containing the most recent Critical alerts spanning the active timeframe. Can be sent to legal and management teams.</p>
+                        <p class="text-slate-400 text-center mb-8">Generate a formal PDF document containing the most
+                            recent Critical alerts spanning the active timeframe. Can be sent to legal and management
+                            teams.</p>
                         <div class="flex justify-center">
-                            <button onclick="exportPDF()" class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 text-white font-semibold px-8 py-3 rounded-2xl flex items-center gap-3 transition-all shadow-lg shadow-red-500/20 active:scale-95">
+                            <button onclick="exportPDF()"
+                                class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 text-white font-semibold px-8 py-3 rounded-2xl flex items-center gap-3 transition-all shadow-lg shadow-red-500/20 active:scale-95">
                                 <i class="fa-solid fa-print"></i> Generate PDF Document
                             </button>
                         </div>
@@ -447,6 +473,43 @@
         function updateCharts() {
             const labels = getTimeLabels();
 
+            // Risk & Attack Charts Updater
+            if (chartCategory) {
+                chartCategory.data.datasets[0].data = [
+                    m.data.categories?.['Malicious'] || 0,
+                    m.data.categories?.['Suspicious'] || 0,
+                    m.data.categories?.['Benign'] || 0
+                ];
+                chartCategory.update('none');
+            }
+            if (chartSeverity) {
+                chartSeverity.data.datasets[0].data = [
+                    m.data.severity?.['Critical'] || 0,
+                    m.data.severity?.['High'] || 0,
+                    m.data.severity?.['Medium'] || 0,
+                    m.data.severity?.['Low'] || 0
+                ];
+                chartSeverity.update('none');
+            }
+            if (chartOS) {
+                chartOS.data.datasets[0].data = [
+                    m.data.os_distribution?.['Linux'] || 0,
+                    m.data.os_distribution?.['Windows'] || 0,
+                    m.data.os_distribution?.['macOS'] || 0
+                ];
+                chartOS.update('none');
+            }
+            if (chartRadar) {
+                chartRadar.data.datasets[0].data = [
+                    m.data.severity?.['Critical'] || 0,
+                    m.data.severity?.['High'] || 0,
+                    m.data.categories?.['Malicious'] || 0,
+                    m.data.categories?.['Suspicious'] || 0,
+                    m.data.os_distribution?.['Windows'] || 0,
+                    m.data.os_distribution?.['Linux'] || 0
+                ];
+                chartRadar.update('none');
+            }
             if (alertChartInstance) alertChartInstance.destroy();
             if (incidentChartInstance) incidentChartInstance.destroy();
 
@@ -531,31 +594,31 @@
         // -----------------------------------------
         // WebSocket & Real-time Alerts Integration
         // -----------------------------------------
-        
-let currentFilter = 'all';
-let searchQuery = '';
-let chartCategory = null;
-let chartSeverity = null;
-let chartOS = null;
-let chartRadar = null;
 
-function renderAlerts() {
-    const tb = document.getElementById('alert-tbody');
-    if(!tb) return;
-    tb.innerHTML = '';
-    let q = searchQuery.toLowerCase();
-    allAlerts.filter(a => (currentFilter==='all' || a.severity===currentFilter) && 
-        (q==='' || a.summary.toLowerCase().includes(q) || a.category.toLowerCase().includes(q) || a.source_os.toLowerCase().includes(q)))
-        .slice(0, 100).forEach(a => {
-            let sCol = a.severity==='Critical'?'text-red-400 border-red-500/30 bg-red-500/10'
-                     :a.severity==='High'?'text-orange-400 border-orange-500/30 bg-orange-500/10'
-                     :a.severity==='Medium'?'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'
-                     :'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
-                     
-            let rColor = a.risk_score>=80?'#ef4444':a.risk_score>=60?'#f97316':a.risk_score>=40?'#eab308':'#10b981';
-            const tr = document.createElement('tr');
-            tr.className = "hover:bg-[#1e2937] transition-colors";
-            tr.innerHTML = `
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let chartCategory = null;
+        let chartSeverity = null;
+        let chartOS = null;
+        let chartRadar = null;
+
+        function renderAlerts() {
+            const tb = document.getElementById('alert-tbody');
+            if (!tb) return;
+            tb.innerHTML = '';
+            let q = searchQuery.toLowerCase();
+            allAlerts.filter(a => (currentFilter === 'all' || a.severity === currentFilter) &&
+                (q === '' || a.summary.toLowerCase().includes(q) || a.category.toLowerCase().includes(q) || a.source_os.toLowerCase().includes(q)))
+                .slice(0, 100).forEach(a => {
+                    let sCol = a.severity === 'Critical' ? 'text-red-400 border-red-500/30 bg-red-500/10'
+                        : a.severity === 'High' ? 'text-orange-400 border-orange-500/30 bg-orange-500/10'
+                            : a.severity === 'Medium' ? 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'
+                                : 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+
+                    let rColor = a.risk_score >= 80 ? '#ef4444' : a.risk_score >= 60 ? '#f97316' : a.risk_score >= 40 ? '#eab308' : '#10b981';
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-[#1e2937] transition-colors";
+                    tr.innerHTML = `
                 <td class="px-6 py-3 border-none">#${a.id}</td>
                 <td class="px-4 py-3 border-none text-slate-400">${a.timestamp.split(' ')[1]}</td>
                 <td class="px-4 py-3 border-none"><span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px] border border-slate-700">${a.source_os}</span></td>
@@ -569,119 +632,119 @@ function renderAlerts() {
                     <span class="text-xs w-6 text-right font-mono" style="color: ${rColor}">${a.risk_score}</span>
                 </td>
             `;
-            tb.appendChild(tr);
-        });
-}
+                    tb.appendChild(tr);
+                });
+        }
 
-function filterAlerts(f, e) {
-    currentFilter = f;
-    document.querySelectorAll('.filter-btn').forEach(b => { 
-        b.classList.remove('bg-cyan-600', 'text-black'); 
-        b.classList.add('bg-transparent', 'text-slate-400', 'border-slate-700'); 
-    });
-    e.classList.remove('bg-transparent', 'text-slate-400', 'border-slate-700');
-    e.classList.add('bg-cyan-600', 'text-black');
-    renderAlerts();
-}
+        function filterAlerts(f, e) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('bg-cyan-600', 'text-black');
+                b.classList.add('bg-transparent', 'text-slate-400', 'border-slate-700');
+            });
+            e.classList.remove('bg-transparent', 'text-slate-400', 'border-slate-700');
+            e.classList.add('bg-cyan-600', 'text-black');
+            renderAlerts();
+        }
 
-function handleSearch() { 
-    searchQuery = document.getElementById('quick-search').value; 
-    renderAlerts(); 
-}
+        function handleSearch() {
+            searchQuery = document.getElementById('quick-search').value;
+            renderAlerts();
+        }
 
-function exportPDF() {
-    if (!window.jspdf) { alert("PDF library loading."); return; }
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.setTextColor(220, 38, 38);
-    doc.text("OpenSOC - Incident Report", 14, 20);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 100, 100);
-    doc.text("Generated: " + new Date().toLocaleString(), 14, 28);
-    
-    const last10 = recentCriticalAlerts.slice(0, 15);
-    if (last10.length === 0) doc.text("No critical alerts recorded.", 14, 40);
-    else {
-        doc.autoTable({
-            startY: 35,
-            head: [['Time', 'OS', 'Category', 'Summary', 'Risk']],
-            body: last10.map(a => [a.timestamp.split(' ')[1], a.source_os, a.category, a.summary, a.risk_score]),
-            theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [220, 38, 38] }
-        });
-    }
-    doc.save("OpenSOC_Export.pdf");
-}
+        function exportPDF() {
+            if (!window.jspdf) { alert("PDF library loading."); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.setTextColor(220, 38, 38);
+            doc.text("AegisCore Dashboard - Incident Report", 14, 20);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(100, 100, 100);
+            doc.text("Generated: " + new Date().toLocaleString(), 14, 28);
 
-function initDashboardCharts() {
-    Chart.defaults.color = '#94a3b8';
-    Chart.defaults.font.family = 'Inter';
-    const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {color: '#cbd5e1'} } }, borderDash: [5,5] };
-    
-    // Doughnut 1
-    const elCat = document.getElementById('chart-category');
-    if(elCat) {
-        chartCategory = new Chart(elCat, {
-            type: 'doughnut',
-            data: { labels: ['Malicious','Suspicious','Benign'], datasets: [{ data:[0,0,0], backgroundColor: ['#ef4444','#f97316','#10b981'], borderWidth:0 }] },
-            options: { ...opts, cutout: '75%' }
-        });
-    }
-    // Bar
-    const elSev = document.getElementById('chart-severity');
-    if(elSev) {
-        chartSeverity = new Chart(elSev, {
-            type: 'bar',
-            data: { labels: ['Critical','High','Medium','Low'], datasets: [{ label: 'Events', data:[0,0,0,0], backgroundColor: ['#ef4444','#f97316','#eab308','#10b981'], borderRadius: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: {color: '#1e2937'} }, x: { grid: {display: false} } } }
-        });
-    }
-    // Doughnut 2
-    const elOS = document.getElementById('chart-os');
-    if(elOS) {
-        chartOS = new Chart(elOS, {
-            type: 'doughnut',
-            data: { labels: ['Linux','Windows','macOS'], datasets: [{ data:[0,0,0], backgroundColor: ['#eab308','#3b82f6','#94a3b8'], borderWidth:0 }] },
-            options: { ...opts, cutout: '75%' }
-        });
-    }
-    // Radar
-    const elRad = document.getElementById('chart-radar');
-    if(elRad) {
-        chartRadar = new Chart(elRad, {
-            type: 'radar',
-            data: {
-                labels: ['Critical', 'High', 'Malicious', 'Suspicious', 'Windows', 'Linux'],
-                datasets: [{
-                    label: 'Network Flow',
-                    data: [0, 0, 2, 0, 0, 7],
-                    backgroundColor: 'rgba(34, 211, 238, 0.2)',
-                    borderColor: '#22d3ee',
-                    pointBackgroundColor: '#22d3ee',
-                    borderWidth: 1.5,
-                    pointRadius: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    r: {
-                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        pointLabels: { color: '#94a3b8', font: {size: 10} },
-                        ticks: { display: false }
-                    }
-                }
+            const last10 = recentCriticalAlerts.slice(0, 15);
+            if (last10.length === 0) doc.text("No critical alerts recorded.", 14, 40);
+            else {
+                doc.autoTable({
+                    startY: 35,
+                    head: [['Time', 'OS', 'Category', 'Summary', 'Risk']],
+                    body: last10.map(a => [a.timestamp.split(' ')[1], a.source_os, a.category, a.summary, a.risk_score]),
+                    theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [220, 38, 38] }
+                });
             }
-        });
-    }
-}
+            doc.save("AegisCore Dashboard_Export.pdf");
+        }
 
-let allAlerts = [];
+        function initDashboardCharts() {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = 'Inter';
+            const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } }, borderDash: [5, 5] };
+
+            // Doughnut 1
+            const elCat = document.getElementById('chart-category');
+            if (elCat) {
+                chartCategory = new Chart(elCat, {
+                    type: 'doughnut',
+                    data: { labels: ['Malicious', 'Suspicious', 'Benign'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#ef4444', '#f97316', '#10b981'], borderWidth: 0 }] },
+                    options: { ...opts, cutout: '75%' }
+                });
+            }
+            // Bar
+            const elSev = document.getElementById('chart-severity');
+            if (elSev) {
+                chartSeverity = new Chart(elSev, {
+                    type: 'bar',
+                    data: { labels: ['Critical', 'High', 'Medium', 'Low'], datasets: [{ label: 'Events', data: [0, 0, 0, 0], backgroundColor: ['#ef4444', '#f97316', '#eab308', '#10b981'], borderRadius: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#1e2937' } }, x: { grid: { display: false } } } }
+                });
+            }
+            // Doughnut 2
+            const elOS = document.getElementById('chart-os');
+            if (elOS) {
+                chartOS = new Chart(elOS, {
+                    type: 'doughnut',
+                    data: { labels: ['Linux', 'Windows', 'macOS'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#eab308', '#3b82f6', '#94a3b8'], borderWidth: 0 }] },
+                    options: { ...opts, cutout: '75%' }
+                });
+            }
+            // Radar
+            const elRad = document.getElementById('chart-radar');
+            if (elRad) {
+                chartRadar = new Chart(elRad, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Critical', 'High', 'Malicious', 'Suspicious', 'Windows', 'Linux'],
+                        datasets: [{
+                            label: 'Network Flow',
+                            data: [0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(34, 211, 238, 0.2)',
+                            borderColor: '#22d3ee',
+                            pointBackgroundColor: '#22d3ee',
+                            borderWidth: 1.5,
+                            pointRadius: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                pointLabels: { color: '#94a3b8', font: { size: 10 } },
+                                ticks: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        let allAlerts = [];
         let recentCriticalAlerts = [];
         let recentNotifications = {};
 
@@ -716,6 +779,14 @@ let allAlerts = [];
             });
         }
 
+
+        function manualStartScan() {
+            fetch("/api/start-scan", { method: "POST" }).then(res => res.json()).then(data => {
+                console.log("Scan started:", data);
+                alert("AI Analysis Simulation Started!");
+            });
+        }
+
         function initWebsocket() {
             const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/alerts`);
             ws.onmessage = e => {
@@ -730,6 +801,93 @@ let allAlerts = [];
                     if (elCrit) elCrit.textContent = ((m.data.severity?.['Critical'] || 0) + (m.data.severity?.['High'] || 0)).toLocaleString();
                     if (elSusp) elSusp.textContent = (m.data.categories?.['Suspicious'] || 0).toLocaleString();
                     if (elReview) elReview.textContent = (m.data.categories?.['Malicious'] || 0).toLocaleString();
+
+                    const elTriage = document.getElementById('stat-triage');
+                    let autoTriaged = (m.data.categories?.['Benign'] || 0) + (m.data.categories?.['Suspicious'] || 0);
+                    let safeRate = m.data.total > 0 ? Math.round((autoTriaged / m.data.total) * 100) : 100;
+                    if (elTriage) elTriage.textContent = safeRate + "%";
+
+                    if (m.data.infrastructure && m.data.infrastructure.length > 0) {
+                        const grid = document.getElementById('infrastructure-grid');
+                        if (grid) {
+                            grid.innerHTML = '';
+                            m.data.infrastructure.forEach(asset => {
+                                const color = asset.status === 'green' ? 'emerald' : asset.status === 'yellow' ? 'amber' : 'red';
+                                grid.innerHTML += `
+                                <div class="bg-[#1e2937] border border-slate-700 rounded-2xl p-4 hover:border-cyan-500 transition-all">
+                                  <div class="flex justify-between">
+                                    <div>
+                                      <p class="font-mono text-sm">${asset.name}</p>
+                                      <p class="text-xs text-slate-500">${asset.type}</p>
+                                    </div>
+                                    <div class="w-3 h-3 rounded-full bg-${color}-500 mt-1"></div>
+                                  </div>
+                                  <p class="font-mono text-xs text-slate-500 mt-6">${asset.ip}</p>
+                                </div>
+                                `;
+                            });
+                        }
+                    }
+
+                    let crit = m.data.severity?.['Critical'] || 0;
+                    let high = m.data.severity?.['High'] || 0;
+                    let total = m.data.total || 0;
+
+                    // Risk & Attack Charts Updater
+                    if (chartCategory) {
+                        chartCategory.data.datasets[0].data = [
+                            m.data.categories?.['Malicious'] || 0,
+                            m.data.categories?.['Suspicious'] || 0,
+                            m.data.categories?.['Benign'] || 0
+                        ];
+                        chartCategory.update('none');
+                    }
+                    if (chartSeverity) {
+                        chartSeverity.data.datasets[0].data = [
+                            m.data.severity?.['Critical'] || 0,
+                            m.data.severity?.['High'] || 0,
+                            m.data.severity?.['Medium'] || 0,
+                            m.data.severity?.['Low'] || 0
+                        ];
+                        chartSeverity.update('none');
+                    }
+                    if (chartOS) {
+                        chartOS.data.datasets[0].data = [
+                            m.data.os_distribution?.['Linux'] || 0,
+                            m.data.os_distribution?.['Windows'] || 0,
+                            m.data.os_distribution?.['macOS'] || 0
+                        ];
+                        chartOS.update('none');
+                    }
+                    if (chartRadar) {
+                        chartRadar.data.datasets[0].data = [
+                            m.data.severity?.['Critical'] || 0,
+                            m.data.severity?.['High'] || 0,
+                            m.data.categories?.['Malicious'] || 0,
+                            m.data.categories?.['Suspicious'] || 0,
+                            m.data.os_distribution?.['Windows'] || 0,
+                            m.data.os_distribution?.['Linux'] || 0
+                        ];
+                        chartRadar.update('none');
+                    }
+                    if (alertChartInstance) {
+                        alertChartInstance.data.datasets[0].data.push(crit);
+                        alertChartInstance.data.datasets[0].data.shift();
+                        alertChartInstance.data.datasets[1].data.push(high);
+                        alertChartInstance.data.datasets[1].data.shift();
+                        alertChartInstance.data.datasets[2].data.push(total);
+                        alertChartInstance.data.datasets[2].data.shift();
+                        alertChartInstance.update('none');
+                    }
+                    if (incidentChartInstance) {
+                        incidentChartInstance.data.datasets[0].data.push(crit);
+                        incidentChartInstance.data.datasets[0].data.shift();
+                        incidentChartInstance.data.datasets[1].data.push(high);
+                        incidentChartInstance.data.datasets[1].data.shift();
+                        incidentChartInstance.data.datasets[2].data.push(total);
+                        incidentChartInstance.data.datasets[2].data.shift();
+                        incidentChartInstance.update('none');
+                    }
                 }
                 else if (m.type === 'alert') {
                     allAlerts.unshift(m.data);
@@ -756,7 +914,13 @@ let allAlerts = [];
         const originalOnLoad = window.onload;
         window.onload = () => {
             if (originalOnLoad) originalOnLoad();
+            initDashboardCharts();
             initWebsocket();
+            // Auto-start simulation on dashboard load
+            fetch("/api/start-scan", { method: "POST" })
+                .then(r => r.json())
+                .then(d => console.log("[AegisCore] Scan auto-started:", d.status))
+                .catch(e => console.warn("[AegisCore] Scan trigger failed:", e));
         };
 
     </script>
