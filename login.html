@@ -1,228 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AegisCore Dashboard • Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AegisCore | SOC Secure Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --bg: #020205;
+        }
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            overflow: hidden;
+            color: white;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Animated Cyber Background */
+        .cyber-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(70, 0, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            background-position: center center;
+            opacity: 0.3;
+        }
+        .cyber-grid::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg) 80%);
         }
 
-        .glass {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(24px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        .glow-sphere {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 20s infinite alternate ease-in-out;
         }
 
-        .gradient-text {
-            background: linear-gradient(90deg, #22d3ee, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        @keyframes float {
+            0% { transform: translate(-10%, -10%) scale(1); }
+            100% { transform: translate(10%, 10%) scale(1.2); }
         }
 
-        .input-focus {
+        .glass-card {
+            background: rgba(10, 10, 18, 0.6);
+            backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,242,255,0.05);
+            border-radius: 2rem;
+            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .input-group {
+            position: relative;
             transition: all 0.3s ease;
         }
-
-        .input-focus:focus {
-            border-color: #22d3ee;
-            box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.15);
-            transform: translateY(-2px);
+        .input-group:focus-within { transform: translateX(8px); }
+        
+        .cyber-input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+            color: white;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        .cyber-input:focus {
+            outline: none;
+            background: rgba(0, 242, 255, 0.05);
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
         }
 
-        .cyber-line {
-            position: absolute;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #22d3ee, transparent);
-            animation: scan 4s linear infinite;
+        .accent-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        @keyframes scan {
-            0% {
-                transform: translateY(-100%);
-            }
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: black;
+            font-weight: 700;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 40px rgba(0, 242, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .primary-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(0, 242, 255, 0.4);
+            filter: brightness(1.1);
+        }
+        .primary-btn:active { transform: translateY(1px) scale(0.98); }
 
-            100% {
-                transform: translateY(800%);
-            }
+        .scanline {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 242, 255, 0.02) 50%);
+            background-size: 100% 4px;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
         }
     </style>
 </head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="scanline"></div>
+    <div class="cyber-grid"></div>
+    <div class="glow-sphere top-0 left-0"></div>
+    <div class="glow-sphere bottom-0 right-0" style="animation-delay: -5s; background: radial-gradient(circle, rgba(112, 0, 255, 0.08) 0%, transparent 70%);"></div>
 
-<body class="bg-[#0a0f1c] min-h-screen flex items-center justify-center overflow-hidden relative">
+    <div class="relative z-10 w-full max-w-4xl px-6">
+        <div class="glass-card p-10 relative overflow-hidden">
+            <!-- Decorative Corners -->
+            <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-500/30 rounded-tl-3xl"></div>
+            <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-purple-500/30 rounded-br-3xl"></div>
 
-    <!-- Background Effects -->
-    <div class="absolute inset-0 bg-[radial-gradient(at_center,#22d3ee10_0%,transparent_70%)]"></div>
-
-    <!-- Subtle grid background -->
-    <div
-        class="absolute inset-0 bg-[linear-gradient(to_right,#1e293720_1px,transparent_1px),linear-gradient(to_bottom,#1e293720_1px,transparent_1px)] bg-[size:40px_40px]">
-    </div>
-
-    <div class="relative z-10 w-full max-w-md px-6">
-        <div class="glass border border-slate-700/50 rounded-3xl p-10">
-
-            <!-- Logo & Header -->
-            <div class="flex flex-col items-center mb-10">
-                <div
-                    class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-2xl flex items-center justify-center mb-4 shadow-xl shadow-cyan-500/30">
-                    <i class="fa-solid fa-shield-halved text-4xl text-black"></i>
-                </div>
-                <h1 class="text-4xl font-bold tracking-tighter gradient-text"> AegisCore Dashboard</h1>
-                <p class="text-cyan-400 text-sm tracking-widest mt-1">SECURITY OPERATIONS</p>
-            </div>
-
-            <h2 class="text-2xl font-semibold text-center text-white mb-8">Welcome back, Analyst</h2>
-
-            <!-- Login Form -->
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
-
-                <!-- Username -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Username or Email</label>
-                    <div class="relative">
-                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
-                            <i class="fa-solid fa-user"></i>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                
+                <!-- Left: Logo & Branding -->
+                <div class="text-center md:text-left space-y-6">
+                    <div class="inline-flex relative">
+                        <div class="absolute inset-0 bg-cyan-500 blur-2xl opacity-20"></div>
+                        <div class="w-20 h-20 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl flex items-center justify-center relative shadow-2xl">
+                            <i class="fa-solid fa-shield-halved text-4xl text-black"></i>
                         </div>
-                        <input type="text" id="username" placeholder="admin" value="admin" required
-                            class="input-focus w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 pl-11 pr-4 text-white placeholder-slate-500 focus:outline-none">
                     </div>
+                    <div>
+                        <h1 class="text-5xl font-black tracking-tighter mb-2">AEGIS<span class="accent-gradient">CORE</span></h1>
+                        <div class="flex items-center justify-center md:justify-start gap-2 text-[9px] tracking-[0.4em] uppercase font-bold text-slate-500">
+                            <div class="status-dot"></div>
+                            Secure Neural Node [PNE_01]
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium leading-relaxed max-w-xs mono">
+                        Authorized personnel only. All access attempts are monitored and recorded by the Aegis AI engine.
+                    </p>
                 </div>
 
-                <!-- Password -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Password</label>
-                    <div class="relative">
-                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
-                            <i class="fa-solid fa-lock"></i>
+                <!-- Right: Auth Form -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-bold tracking-tight text-white mb-4">Operator Authentication</h2>
+                    
+                    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
+                        <div class="input-group">
+                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+                                <i class="fa-solid fa-fingerprint text-lg"></i>
+                            </div>
+                            <input type="text" id="username" placeholder="OPERATOR_TAG" required
+                                class="cyber-input mono text-xs py-3 pl-12 placeholder:text-slate-700">
                         </div>
-                        <input type="password" id="password" placeholder="••••••••" value="password123" required
-                            class="input-focus w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 pl-11 pr-4 text-white placeholder-slate-500 focus:outline-none">
-                        <button type="button" onclick="togglePassword()"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400">
-                            <i id="eye-icon" class="fa-solid fa-eye"></i>
+
+                        <div class="input-group">
+                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+                                <i class="fa-solid fa-lock-open text-lg"></i>
+                            </div>
+                            <input type="password" id="password" placeholder="••••••••" required
+                                class="cyber-input mono text-xs py-3 pl-12 placeholder:text-slate-700">
+                        </div>
+
+                        <div class="flex items-center justify-between px-1">
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="checkbox" class="w-3 h-3 accent-cyan-500 border-none rounded">
+                                <span class="text-[9px] font-bold text-slate-500 tracking-wider">PERSISTENCE</span>
+                            </label>
+                            <a href="#" class="text-[9px] font-bold text-cyan-500 hover:text-white transition-all tracking-widest">RECOVER HANDSHAKE</a>
+                        </div>
+
+                        <button type="submit" id="loginBtn" class="w-full primary-btn py-3 text-sm shadow-cyan-500/20">
+                            Enter Perimeter
                         </button>
+                    </form>
+
+                    <!-- SSO -->
+                    <div class="pt-6 border-t border-slate-800/50 flex flex-col gap-4">
+                        <div class="flex gap-2">
+                            <button onclick="ssoLogin('Azure')" class="flex-1 py-2 bg-slate-900/50 border border-slate-800 rounded-xl hover:border-cyan-500/50 transition-all group flex justify-center items-center">
+                                <i class="fa-brands fa-microsoft text-sm text-slate-500 group-hover:text-cyan-500"></i>
+                            </button>
+                            <button onclick="ssoLogin('Okta')" class="flex-1 py-2 bg-slate-900/50 border border-slate-800 rounded-xl hover:border-purple-500/50 transition-all group flex justify-center items-center">
+                                <i class="fa-solid fa-key text-sm text-slate-500 group-hover:text-purple-500"></i>
+                            </button>
+                        </div>
+                        <div class="text-[8px] font-bold text-slate-700 text-center uppercase tracking-widest">
+                            NODE_ID: PNE_SEC_01 // ENCRYPTION: AES-256
+                        </div>
                     </div>
                 </div>
-
-                <!-- Remember Me + Forgot -->
-                <div class="flex items-center justify-between text-sm">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" class="w-4 h-4 accent-cyan-500">
-                        <span class="text-slate-400">Remember me</span>
-                    </label>
-                    <a href="#" class="text-cyan-400 hover:text-cyan-300 transition-colors">Forgot password?</a>
-                </div>
-
-                <!-- Login Button -->
-                <button type="submit" id="loginBtn"
-                    class="w-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-black font-semibold py-4 rounded-2xl text-lg transition-all active:scale-95 shadow-lg shadow-cyan-500/30">
-                    Sign In
-                </button>
-            </form>
-
-            <!-- Divider -->
-            <div class="my-8 flex items-center gap-4">
-                <div class="flex-1 h-px bg-slate-700"></div>
-                <span class="text-slate-500 text-sm">OR</span>
-                <div class="flex-1 h-px bg-slate-700"></div>
-            </div>
-
-            <!-- SSO Buttons -->
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="ssoLogin('Azure')"
-                    class="flex items-center justify-center gap-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-2xl py-3 transition-all">
-                    <i class="fa-brands fa-microsoft text-xl"></i>
-                    <span class="text-sm font-medium">Azure AD</span>
-                </button>
-                <button onclick="ssoLogin('Okta')"
-                    class="flex items-center justify-center gap-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-2xl py-3 transition-all">
-                    <i class="fa-solid fa-key text-xl"></i>
-                    <span class="text-sm font-medium">Okta</span>
-                </button>
-            </div>
-
-            <!-- Footer -->
-            <div class="text-center mt-10 text-xs text-slate-500">
-                <p>Access restricted to authorized SOC personnel only</p>
-                <p class="mt-2">Pune • SOC v0.2</p>
             </div>
         </div>
     </div>
 
-    <!-- Animated scanning lines -->
-    <div class="cyber-line w-full top-0 left-0 opacity-20"></div>
-    <div class="cyber-line w-full top-0 left-0 opacity-10" style="animation-delay: 1.2s"></div>
-
     <script>
         async function handleLogin(e) {
             e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = `<span class="mono animate-pulse">INITIATING_HANDSHAKE...</span>`;
+            btn.disabled = true;
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const btn = document.getElementById('loginBtn');
-            const originalBg = btn.style.background;
-
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Authenticating...`;
-            btn.disabled = true;
 
             try {
                 const res = await fetch('/api/auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: username, password: password })
+                    body: JSON.stringify({ username, password })
                 });
 
                 if (res.ok) {
-                    btn.innerHTML = `✓ Access Granted`;
-                    btn.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 800);
+                    btn.innerHTML = `<span class="mono">ACCESS_GRANTED</span>`;
+                    btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    setTimeout(() => { window.location.href = '/dashboard'; }, 800);
                 } else {
-                    btn.innerHTML = `Sign In`;
-                    btn.disabled = false;
-                    btn.style.background = originalBg;
-                    alert("ACCESS DENIED. VERIFY CREDENTIALS.");
+                    throw new Error();
                 }
             } catch (err) {
-                btn.innerHTML = `Sign In`;
-                btn.disabled = false;
-                alert('NETWORK ERROR. UNABLE TO REACH AUTH SERVER.');
+                btn.innerHTML = `<span class="mono text-red-950 font-black">ACCESS_DENIED</span>`;
+                btn.classList.add('bg-red-500');
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('bg-red-500');
+                }, 2000);
             }
         }
 
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eye-icon');
-
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                passwordInput.type = "password";
-                eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
-            }
-        }
-
-        function ssoLogin(provider) {
-            alert(`🔐 Redirecting to ${provider} SSO...\n\n(This is a demo)`);
-        }
-
-        // Bonus: Press Enter to login
-        document.addEventListener('keypress', function (e) {
-            if (e.key === "Enter") {
-                const form = document.getElementById('loginForm');
-                if (form) form.dispatchEvent(new Event('submit'));
-            }
-        });
+        function ssoLogin(p) { alert(`Establishing secure tunnel to ${p} SSO...`); }
     </script>
-
 </body>
-
 </html>

@@ -33,6 +33,41 @@
             color: white;
         }
 
+        /* Custom scrollbar for alert list */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .animate-critical {
+            animation: pulse-red 2s infinite;
+        }
+
         .sidebar-mobile {
             transform: translateX(-100%);
             transition: transform 0.3s ease;
@@ -67,57 +102,18 @@
 
     <div class="flex h-screen overflow-hidden">
 
-        <!-- Sidebar -->
-        <div id="sidebar"
-            class="w-72 bg-[#0f172a] border-r border-slate-800 flex flex-col sidebar-mobile absolute lg:relative lg:translate-x-0 h-full z-50">
-            <div class="p-6 border-b border-slate-800">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center">
-                        <i class="fa-solid fa-shield-halved text-black text-3xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-bold tracking-tighter">AegisCore Dashboard</h1>
-                        <p class="text-xs text-cyan-400 -mt-1"></p>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="flex-1 overflow-y-auto p-4">
-                <ul class="space-y-1">
-                    <li><a href="#" onclick="switchTab(0)"
-                            class="flex items-center gap-3 px-4 py-3 bg-slate-800 rounded-2xl text-sm font-medium"><i
-                                class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
-                    <li><a href="#" onclick="switchTab(1)"
-                            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i
-                                class="fa-solid fa-upload"></i> Log Ingestion</a></li>
-                    <li><a href="#" onclick="switchTab(2)"
-                            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i
-                                class="fa-solid fa-magnifying-glass"></i> Threat Analysis</a></li>
-                    <li><a href="#" onclick="switchTab(3)"
-                            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i
-                                class="fa-solid fa-chart-line"></i> Risk Scoring</a></li>
-                    <li><a href="#" onclick="switchTab(4)"
-                            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800/70 rounded-2xl text-sm"><i
-                                class="fa-solid fa-file-chart-column"></i> Reports</a></li>
-                </ul>
-            </nav>
-
-            <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
-                AegisCore Dashboard v0.1 POC • Pune, India
-            </div>
-        </div>
-
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 flex flex-col overflow-hidden w-full">
 
             <!-- Top Navbar -->
             <header class="bg-[#0f172a] border-b border-slate-800 px-4 lg:px-8 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden text-2xl">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <h1 id="page-title" class="text-2xl font-semibold">Security Operations Dashboard</h1>
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-black text-2xl"></i>
+                    </div>
+                    <h1 id="page-title" class="text-2xl font-bold tracking-tighter">AegisCore <span
+                            class="font-normal text-slate-400">| Security Operations</span></h1>
                 </div>
 
                 <div class="flex items-center gap-4 lg:gap-8">
@@ -126,26 +122,50 @@
                         <span class="text-sm">Live</span>
                     </div>
 
-                    <button onclick="refreshDashboard()"
-                        class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-2xl text-sm">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        <span class="hidden sm:inline">Refresh</span>
-                    </button>
+                    <div class="relative">
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <button onclick="toggleProfileMenu()"
+                                    class="flex items-center gap-3 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700 rounded-2xl py-2 px-4 transition-all">
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-black font-bold">A</div>
+                                    <span class="hidden md:block text-sm font-medium">Analyst-01</span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-500"></i>
+                                </button>
+                                <div id="profile-menu" class="hidden absolute right-0 mt-2 w-48 glass border border-slate-700 rounded-2xl shadow-2xl z-[110] overflow-hidden">
+                                    <div class="p-4 border-b border-slate-700 bg-slate-800/30">
+                                        <p class="text-xs text-slate-500 uppercase tracking-widest font-bold">SOC Access</p>
+                                    </div>
+                                    <button onclick="logout()" class="w-full text-left p-4 hover:bg-red-500/10 text-red-400 text-sm flex items-center gap-3 transition-colors">
+                                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                                    </button>
+                                </div>
+                            </div>
+                                <div class="relative cursor-pointer group" onclick="toggleNotificationPopup(event)">
+                                    <i
+                                        class="fa-solid fa-bell text-xl text-slate-400 group-hover:text-white transition-colors"></i>
+                                    <span id="bell-badge"
+                                        class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden border-2 border-[#0f172a]">0</span>
+                                </div>
+                            </div>
 
-                    <div class="flex items-center gap-3">
-                        <div class="relative cursor-pointer"
-                            onclick="document.getElementById('bell-badge').classList.add('hidden')">
-                            <i class="fa-solid fa-bell text-xl"></i>
-                            <span id="bell-badge"
-                                class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full hidden">!</span>
-                        </div>
-                        <div class="text-right hidden md:block">
-                            <p class="text-sm font-medium">Admin</p>
-                            <p class="text-xs text-slate-500">SOC Analyst</p>
-                        </div>
-                        <div
-                            class="w-9 h-9 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl flex items-center justify-center font-bold text-black">
-                            Ad
+                        <div id="notif-popup"
+                            class="hidden absolute right-0 mt-4 w-96 glass border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[100]">
+                            <div
+                                class="p-4 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                                <h3 class="font-bold text-sm tracking-widest text-red-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-exclamation"></i> CRITICAL OVERVIEW
+                                </h3>
+                                <button onclick="clearNotifications()"
+                                    class="text-[10px] uppercase font-bold text-slate-500 hover:text-white transition-colors">Clear All</button>
+                            </div>
+                            <div id="notif-list" class="max-h-[400px] overflow-y-auto custom-scrollbar p-2">
+                                <div class="text-center p-8 text-slate-500 text-sm italic">No unread critical threats</div>
+                            </div>
+
+                            <div class="p-3 bg-slate-900/50 border-t border-slate-800 text-center">
+                                <button onclick="switchTab(2); toggleNotificationPopup(event)"
+                                    class="text-xs text-cyan-400 font-semibold hover:underline">View All Intelligence Logs</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -167,7 +187,7 @@
                         id="tab-3">Risk Scoring</button>
                     <button onclick="switchTab(4)"
                         class="py-4 px-2 text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap"
-                        id="tab-4">Reports</button>
+                        id="tab-4">Infrastructure Status</button>
                 </div>
             </div>
 
@@ -175,98 +195,147 @@
             <div class="flex-1 overflow-auto p-4 lg:p-8" id="content-area">
 
                 <!-- DASHBOARD TAB -->
-                <div id="content-0">
-                    <div class="flex justify-between items-end mb-8">
+                <div id="content-0" class="h-full flex flex-col pb-4">
+                    <div class="flex justify-between items-end mb-4">
                         <div>
-                            <h1 class="text-3xl font-semibold">Security Operations Dashboard</h1>
-                            <p class="text-slate-400">Real-time monitoring and incident response</p>
+                            <p class="text-slate-400">Real-time threat monitoring feed</p>
                         </div>
                         <div class="text-right text-sm">
                             <p id="current-time"></p>
-                            <p class="text-xs text-slate-500">Last updated: <span id="last-updated">Just now</span></p>
                         </div>
                     </div>
 
-                    <!-- KPI Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-                            <p class="text-slate-400 text-sm">Critical Incidents</p>
-                            <p class="text-4xl font-bold mt-2 text-red-400" id="stat-critical">0</p>
-                            <p class="text-xs text-slate-500 mt-6">High priority</p>
-                        </div>
-                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-                            <p class="text-slate-400 text-sm">Review Required</p>
-                            <p class="text-4xl font-bold mt-2 text-orange-400" id="stat-review">0</p>
-                            <p class="text-xs text-slate-500 mt-6">Medium priority</p>
-                        </div>
-                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-                            <p class="text-slate-400 text-sm">Uncertain Alerts</p>
-                            <p class="text-4xl font-bold mt-2 text-yellow-400" id="stat-suspicious">0</p>
-                            <p class="text-xs text-slate-500 mt-6">Needs review</p>
-                        </div>
-                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-                            <p class="text-slate-400 text-sm">Active Incidents</p>
-                            <p class="text-4xl font-bold mt-2 text-cyan-400" id="stat-total">0</p>
-                            <p class="text-xs text-slate-500 mt-6">In progress</p>
-                        </div>
-                        <div class="glass border border-slate-700 rounded-3xl p-6 card-hover">
-                            <p class="text-slate-400 text-sm">AI Triage Rate</p>
-                            <p class="text-4xl font-bold mt-2 text-emerald-400" id="stat-triage">87%</p>
-                            <p class="text-xs text-slate-500 mt-6">Auto Triaged</p>
-                        </div>
-                    </div>
+                    <!-- 3 Column Layout -->
+                    <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-hidden min-h-[500px]">
 
-                    <!-- Charts with better size -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-                        <div class="glass border border-slate-700 rounded-3xl p-6">
-                            <h2 class="font-semibold mb-4">Alert Triage Trends (Last 7 Hours)</h2>
-                            <div class="chart-container">
-                                <canvas id="alertChart"></canvas>
+                        <!-- Col 1: Live Network Feed -->
+                        <div class="glass border border-slate-700 rounded-3xl flex flex-col overflow-hidden h-full">
+                            <div
+                                class="p-4 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                                <h2 class="font-semibold flex items-center gap-2"><i
+                                        class="fa-solid fa-network-wired text-cyan-400"></i> Live Network</h2>
+                                <span
+                                    class="bg-cyan-500/20 text-cyan-400 text-xs px-2 py-1 rounded-full animate-pulse">Recording</span>
                             </div>
-                        </div>
-                        <div class="glass border border-slate-700 rounded-3xl p-6">
-                            <h2 class="font-semibold mb-4">Incident Trends (Last 7 Hours)</h2>
-                            <div class="chart-container">
-                                <canvas id="incidentChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Infrastructure & Recent Incidents -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
-                        <div class="lg:col-span-7 glass border border-slate-700 rounded-3xl p-6">
-                            <h2 class="font-semibold mb-6">Infrastructure Status</h2>
-                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="infrastructure-grid">
+                            <div id="feed-all" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                                <div class="text-center text-slate-500 mt-10 text-sm">Waiting for traffic...</div>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-5 glass border border-slate-700 rounded-3xl p-6">
-                            <h2 class="font-semibold mb-6">Recent Critical Incidents</h2>
-                            <div class="space-y-5" id="recent-incidents-container">
-                                <div class="bg-[#1e2937] border-l-4 border-orange-500 p-5 rounded-r-3xl">
-                                    <p class="font-medium">Account privilege escalation</p>
-                                    <p class="text-xs text-slate-400 mt-1">Insider Threat • 3 min ago</p>
+                        <!-- Col 2: Critical / High -->
+                        <div class="glass border border-slate-700 rounded-3xl flex flex-col overflow-hidden h-full">
+                            <div
+                                class="p-4 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                                <h2 class="font-semibold flex items-center gap-2"><i
+                                        class="fa-solid fa-triangle-exclamation text-orange-500"></i> Critical & High
+                                </h2>
+                                <span
+                                    class="bg-orange-500/20 text-orange-400 text-xs px-2 py-1 rounded-full">Attention</span>
+                            </div>
+                            <div id="feed-critical" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                                <div class="text-center text-slate-500 mt-10 text-sm">Monitoring...</div>
+                            </div>
+                        </div>
+
+                        <!-- Col 3: Details -->
+                        <div class="glass border border-slate-700 rounded-3xl flex flex-col overflow-hidden h-full relative"
+                            id="incident-details-panel">
+                            <div
+                                class="p-4 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                                <h2 class="font-semibold flex items-center gap-2"><i
+                                        class="fa-solid fa-microscope text-purple-400"></i> Event Details</h2>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center text-center text-slate-500"
+                                id="empty-details">
+                                <i class="fa-solid fa-hand-pointer text-4xl mb-4 opacity-50"></i>
+                                <p>Select a network packet to view in-depth details</p>
+                            </div>
+                            <div id="active-details" class="flex-1 overflow-y-auto p-6 hidden flex flex-col h-full custom-scrollbar">
+                                <div class="flex justify-between items-start mb-6">
+                                    <div>
+                                        <div id="detail-severity"
+                                            class="text-[10px] font-bold tracking-widest text-red-400 mb-1">CRITICAL
+                                        </div>
+                                        <h3 id="detail-summary" class="text-xl font-bold text-white mb-2 line-clamp-2">
+                                            Unauthorized Access Attempt</h3>
+                                        <p id="detail-time" class="text-xs text-slate-400">2026-04-03 12:45:00</p>
+                                    </div>
+                                    <div class="text-right ml-4">
+                                        <div class="text-2xl font-bold font-mono" id="detail-risk">92</div>
+                                        <div class="text-[10px] tracking-widest text-slate-500">RISK SCORE</div>
+                                    </div>
                                 </div>
-                                <div class="bg-[#1e2937] border-l-4 border-red-500 p-5 rounded-r-3xl">
-                                    <p class="font-medium">Suspicious process execution</p>
-                                    <p class="text-xs text-slate-400 mt-1">SRV-IT-02 • 12 min ago</p>
+                                <!-- Incident Breakdown -->
+                                <div class="space-y-4 mb-6">
+                                    <div class="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50">
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Technical Summary</p>
+                                        <p id="detail-content" class="text-sm text-slate-300 leading-relaxed font-mono whitespace-pre-wrap max-h-40 overflow-y-auto custom-scrollbar"></p>
+                                    </div>
+                                    <div class="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Deep Forensic Metadata</p>
+                                            <button onclick="copyHeaders()" class="text-[10px] text-cyan-400 hover:text-white transition-colors"><i class="fa-solid fa-copy"></i> Copy</button>
+                                        </div>
+                                        <div id="detail-headers" class="text-[11px] text-cyan-400/70 font-mono whitespace-pre-wrap max-h-60 overflow-y-auto custom-scrollbar bg-black/20 p-3 rounded-xl border border-cyan-500/10"></div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                    <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
+                                        <div class="text-[10px] text-slate-500 tracking-wider mb-1">SOURCE IP</div>
+                                        <div id="detail-ip" class="font-mono text-sm text-slate-200">192.168.1.1</div>
+                                    </div>
+                                    <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
+                                        <div class="text-[10px] text-slate-500 tracking-wider mb-1">CATEGORY</div>
+                                        <div id="detail-category" class="font-mono text-sm text-slate-200">Malicious
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-auto pt-4 flex flex-col gap-2">
+                                    <button onclick="downloadActiveReport()"
+                                        class="w-full bg-slate-100 hover:bg-white text-black font-semibold py-3 rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg hover:shadow-cyan-500/20 active:scale-95">
+                                        <i class="fa-solid fa-file-pdf"></i> Download Incident Report
+                                    </button>
+                                    <button onclick="downloadRawJSON()"
+                                        class="w-full bg-slate-800/50 hover:bg-slate-700/50 text-cyan-400 font-semibold py-3 rounded-xl transition-all border border-cyan-500/20 flex justify-center items-center gap-2 active:scale-95">
+                                        <i class="fa-solid fa-file-code"></i> Download Raw Metadata (JSON)
+                                    </button>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
-                <!-- Other Tabs -->
-                <div id="content-1" class="hidden">
-                    <h1 class="text-3xl font-semibold mb-6">Log Ingestion</h1>
-                    <div class="glass border border-slate-700 rounded-3xl p-8 text-center">
-                        <i class="fa-solid fa-upload text-6xl text-cyan-400 mb-6"></i>
-                        <p class="text-2xl font-medium">Log Ingestion Pipeline</p>
-                        <p class="text-slate-400 mt-4">Connect sources • Monitor ingestion rate • View parsing errors
-                        </p>
-                        <button
-                            class="mt-8 bg-cyan-500 hover:bg-cyan-600 text-black font-medium px-8 py-3 rounded-2xl">Add
-                            New Log Source</button>
+                <!-- LOG INGESTION TAB -->
+                <div id="content-1" class="hidden h-full flex flex-col">
+                    <h1 class="text-3xl font-semibold mb-6">Log Ingestion Engine</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                        <div class="glass border border-slate-700 rounded-3xl p-8 flex flex-col items-center justify-center text-center border-dashed border-2 hover:border-cyan-500 transition-all cursor-pointer group"
+                             onclick="document.getElementById('file-upload').click()">
+                            <input type="file" id="file-upload" class="hidden" onchange="handleFileUpload(event)" accept=".txt,.log,.json,.csv">
+                            <i class="fa-solid fa-cloud-arrow-up text-6xl text-slate-700 group-hover:text-cyan-400 mb-6 transition-colors"></i>
+                            <p class="text-2xl font-medium mb-2">Drag & Drop Log Files</p>
+                            <p class="text-slate-400 max-w-xs mx-auto">Upload .log, .txt, or JSON exports from your infrastructure for real-time AI classification.</p>
+                            <div id="upload-status" class="mt-8 hidden w-full">
+                                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-2">
+                                    <div id="upload-progress" class="bg-cyan-500 h-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                <p class="text-xs text-cyan-400 font-mono" id="upload-text">Processing local ingestion...</p>
+                            </div>
+                        </div>
+                        <div class="glass border border-slate-700 rounded-3xl p-8 flex flex-col overflow-hidden">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-bold tracking-widest text-slate-500 text-xs uppercase">Recent Ingestions</h3>
+                                <span id="ingestion-count" class="bg-cyan-500/20 text-cyan-400 text-[10px] px-2 py-0.5 rounded-full font-bold">0 FILES</span>
+                            </div>
+                            <div id="ingestion-history" class="space-y-4 overflow-y-auto custom-scrollbar flex-1">
+                                <div class="flex flex-col items-center justify-center h-full text-center opacity-30">
+                                    <i class="fa-solid fa-folder-open text-4xl mb-4"></i>
+                                    <p class="text-xs">No active ingestions</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -281,17 +350,30 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-4 mb-6">
-                        <button onclick="filterAlerts('all', this)"
-                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-cyan-600 text-black shadow-lg">ALL</button>
-                        <button onclick="filterAlerts('Critical', this)"
-                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">CRITICAL</button>
-                        <button onclick="filterAlerts('High', this)"
-                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">HIGH</button>
-                        <button onclick="filterAlerts('Medium', this)"
-                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">MEDIUM</button>
-                        <button onclick="filterAlerts('Low', this)"
-                            class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">LOW</button>
+                    <div class="flex flex-wrap gap-4 mb-6 justify-between items-center">
+                        <div class="flex gap-4">
+                            <button onclick="filterAlerts('all', this)"
+                                class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-cyan-600 text-black shadow-lg">ALL</button>
+                            <button onclick="filterAlerts('Critical', this)"
+                                class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">CRITICAL</button>
+                            <button onclick="filterAlerts('High', this)"
+                                class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">HIGH</button>
+                            <button onclick="filterAlerts('Medium', this)"
+                                class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">MEDIUM</button>
+                            <button onclick="filterAlerts('Low', this)"
+                                class="filter-btn px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400">LOW</button>
+                            
+                            <div class="w-px h-6 bg-slate-700 mx-1 self-center"></div>
+                            
+                            <button id="pause-btn" onclick="togglePauseAnalysis()"
+                                class="group flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border border-slate-700 text-slate-400 hover:text-white transition-all">
+                                <i class="fa-solid fa-pause group-hover:animate-pulse"></i> PAUSE LIVE FEED
+                            </button>
+                        </div>
+                        <button onclick="downloadAISummary()"
+                            class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-semibold px-6 py-2 rounded-full text-sm flex items-center gap-2 shadow-lg shadow-purple-500/20 transition-all active:scale-95">
+                            <i class="fa-solid fa-file-pdf"></i> Download Tactical Summary Report
+                        </button>
                     </div>
 
                     <div class="glass border border-slate-700 rounded-3xl overflow-hidden h-[600px] flex flex-col">
@@ -300,7 +382,12 @@
                                 <thead
                                     class="sticky top-0 bg-[#0f172a] shadow-md z-10 text-xs text-slate-400 uppercase tracking-wider">
                                     <tr>
-                                        <th class="px-6 py-4 font-semibold border-b border-slate-700">ID</th>
+                                        <th class="px-6 py-4 font-semibold border-b border-slate-700 w-10">
+                                            <input type="checkbox" id="selectAll"
+                                                class="w-4 h-4 bg-slate-800 border border-slate-700 rounded text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-900 cursor-pointer"
+                                                onclick="toggleAllCheckboxes(this)">
+                                        </th>
+                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">ID</th>
                                         <th class="px-4 py-4 font-semibold border-b border-slate-700">TIME</th>
                                         <th class="px-4 py-4 font-semibold border-b border-slate-700">SOURCE</th>
                                         <th class="px-4 py-4 font-semibold border-b border-slate-700">SEVERITY</th>
@@ -366,19 +453,10 @@
                     </div>
                 </div>
 
-                <div id="content-4" class="hidden">
-                    <h1 class="text-3xl font-semibold mb-6">Reports Engine</h1>
-                    <div class="glass border border-slate-700 rounded-3xl p-8 max-w-2xl">
-                        <i class="fa-solid fa-file-pdf text-6xl text-red-500 mb-6 block text-center"></i>
-                        <h2 class="text-2xl font-medium text-center text-white mb-4">Export Incident Report</h2>
-                        <p class="text-slate-400 text-center mb-8">Generate a formal PDF document containing the most
-                            recent Critical alerts spanning the active timeframe. Can be sent to legal and management
-                            teams.</p>
-                        <div class="flex justify-center">
-                            <button onclick="exportPDF()"
-                                class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 text-white font-semibold px-8 py-3 rounded-2xl flex items-center gap-3 transition-all shadow-lg shadow-red-500/20 active:scale-95">
-                                <i class="fa-solid fa-print"></i> Generate PDF Document
-                            </button>
+                <div id="content-4" class="hidden h-full flex flex-col">
+                    <h1 class="text-3xl font-semibold mb-6">Infrastructure Status</h1>
+                    <div class="glass border border-slate-700 rounded-3xl p-6 flex-1">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="infrastructure-grid">
                         </div>
                     </div>
                 </div>
@@ -387,11 +465,189 @@
         </div>
     </div>
 
+    <!-- Forensic Mini-Window (Modal) -->
+    <div id="forensic-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+        <div class="glass border border-slate-700 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div class="p-6 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div id="modal-severity-badge" class="px-2 py-1 bg-red-500/20 text-red-500 text-[10px] font-bold rounded-lg tracking-widest uppercase">CRITICAL</div>
+                    <h3 class="text-lg font-bold text-white tracking-tight">Forensic Deep-Dive</h3>
+                </div>
+                <button onclick="closeForensicModal()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <div class="mb-6">
+                    <h4 id="modal-summary" class="text-xl font-bold text-white mb-2 italic">Unauthorized Access Attempt</h4>
+                    <p id="modal-meta" class="text-xs text-slate-500 font-mono">ID: #000 • 2026-04-03 12:45:00</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="p-4 rounded-2xl bg-slate-900/50 border border-slate-700/50">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Source IP</p>
+                        <p id="modal-ip" class="font-mono text-sm text-cyan-400">192.168.1.1</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-slate-900/50 border border-slate-700/50">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Risk Score</p>
+                        <p id="modal-risk" class="font-mono text-sm text-red-500 font-bold">92/100</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Forensic Headers (JSON)</p>
+                        <pre id="modal-headers" class="p-4 rounded-2xl bg-black/40 border border-cyan-500/10 text-[11px] text-cyan-400 font-mono overflow-y-auto max-h-[300px] custom-scrollbar"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-slate-800/30 border-t border-slate-700 flex gap-4">
+                <button id="modal-download-btn" class="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition-all flex justify-center items-center gap-2 active:scale-95 shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-download"></i> Download Metadata
+                </button>
+                <button onclick="closeForensicModal()" class="px-8 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Chart instances
+        // Global UI State
         let currentTab = 0;
-        let alertChartInstance = null;
-        let incidentChartInstance = null;
+        let unreadCriticalAlerts = [];
+        let isPausedAnalysis = false;
+
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function logout() {
+            // In a real app, hit /logout endpoint
+            window.location.href = '/login';
+        }
+
+        function togglePauseAnalysis() {
+            isPausedAnalysis = !isPausedAnalysis;
+            const btn = document.getElementById('pause-btn');
+            if (isPausedAnalysis) {
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> RESUME LIVE FEED';
+                btn.classList.add('bg-cyan-500/10', 'text-cyan-400');
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-pause group-hover:animate-pulse"></i> PAUSE LIVE FEED';
+                btn.classList.remove('bg-cyan-500/10', 'text-cyan-400');
+                renderAlerts(); // Catch up immediately
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const status = document.getElementById('upload-status');
+            const progress = document.getElementById('upload-progress');
+            const text = document.getElementById('upload-text');
+
+            status.classList.remove('hidden');
+            progress.style.width = '0%';
+            text.textContent = `Ingesting ${file.name}...`;
+
+            // Simulate ingestion
+            let p = 0;
+            const interval = setInterval(() => {
+                p += Math.random() * 30;
+                if (p >= 100) {
+                    p = 100;
+                    clearInterval(interval);
+                    text.textContent = "Ingestion Complete. 42 new signals classified.";
+                    
+                    // Add to ingestion history
+                    const history = document.getElementById('ingestion-history');
+                    const countEl = document.getElementById('ingestion-count');
+                    
+                    if (history.querySelector('.opacity-30')) history.innerHTML = ''; // Clear placeholder
+                    
+                    const entry = document.createElement('div');
+                    entry.className = "flex items-center gap-4 p-4 bg-slate-900/50 rounded-2xl border border-slate-700/30 animate-in fade-in slide-in-from-right-4 duration-300";
+                    entry.innerHTML = `
+                        <div class="p-3 bg-cyan-500/10 rounded-xl text-cyan-400"><i class="fa-solid fa-file-shield"></i></div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium">${file.name}</p>
+                            <p class="text-[10px] text-slate-500 font-mono italic">${(file.size / 1024).toFixed(1)} KB • SUCCESS</p>
+                        </div>
+                        <div class="text-right text-[10px] font-bold text-emerald-400 uppercase">Classified</div>
+                    `;
+                    history.prepend(entry);
+                    
+                    const currentCount = parseInt(countEl.textContent) || 0;
+                    countEl.textContent = `${currentCount + 1} FILES`;
+
+                    setTimeout(() => status.classList.add('hidden'), 3000);
+                }
+                progress.style.width = p + '%';
+            }, 500);
+
+            // In a real app, use FormData and fetch('/api/ingest')
+        }
+
+        function toggleNotificationPopup(event) {
+            if (event) event.stopPropagation();
+            const popup = document.getElementById('notif-popup');
+            if (popup) popup.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            const popup = document.getElementById('notif-popup');
+            const bell = document.querySelector('.group');
+            if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target) && bell && !bell.contains(e.target)) {
+                popup.classList.add('hidden');
+            }
+        });
+
+        function clearNotifications() {
+            unreadCriticalAlerts = [];
+            updateNotificationUI();
+        }
+
+        function updateNotificationUI() {
+            const list = document.getElementById('notif-list');
+            const badge = document.getElementById('bell-badge');
+            if (!list || !badge) return;
+
+            if (unreadCriticalAlerts.length === 0) {
+                list.innerHTML = '<div class="text-center p-8 text-slate-500 text-sm italic">No unread critical threats</div>';
+                badge.classList.add('hidden');
+                badge.classList.remove('animate-critical');
+                return;
+            }
+
+            badge.textContent = unreadCriticalAlerts.length;
+            badge.classList.remove('hidden');
+            badge.classList.add('animate-critical');
+
+            list.innerHTML = unreadCriticalAlerts.map(a => {
+                return `
+                <div onclick="showIncidentDetailsFromNotif(event, ${a.id})" class="p-3 mb-1 rounded-2xl bg-slate-800/40 border border-red-500/20 hover:bg-red-500/10 cursor-pointer transition-all">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-[9px] font-black text-red-500 uppercase tracking-tighter">Critical Threat</span>
+                        <span class="text-[9px] text-slate-500 font-mono">${(a.timestamp || "").split(' ')[1] || ""}</span>
+                    </div>
+                    <p class="text-xs font-bold text-slate-200 line-clamp-1">${a.summary}</p>
+                    <p class="text-[10px] text-slate-500 mt-1 font-mono">${a.source_ip || a.source_os}</p>
+                </div>`;
+            }).join('');
+        }
+
+        function showIncidentDetailsFromNotif(event, alertId) {
+            event.stopPropagation();
+            const alert = allAlerts.find(a => a.id === alertId);
+            if (alert) {
+                showIncidentDetails(alert);
+                if (currentTab !== 0) switchTab(0);
+                toggleNotificationPopup();
+            }
+        }
 
         function switchTab(tabIndex) {
             currentTab = tabIndex;
@@ -405,13 +661,13 @@
             }
 
             const titles = [
-                "Security Operations Dashboard",
-                "Log Ingestion",
-                "Threat Analysis",
-                "Risk Scoring",
-                "Reports"
+                "AegisCore <span class='font-normal text-slate-400'>| Security Operations</span>",
+                "AegisCore <span class='font-normal text-slate-400'>| Log Ingestion</span>",
+                "AegisCore <span class='font-normal text-slate-400'>| Threat Analysis</span>",
+                "AegisCore <span class='font-normal text-slate-400'>| Risk Scoring</span>",
+                "AegisCore <span class='font-normal text-slate-400'>| Infrastructure Status</span>"
             ];
-            document.getElementById('page-title').textContent = titles[tabIndex];
+            document.getElementById('page-title').innerHTML = titles[tabIndex];
         }
 
         function toggleSidebar() {
@@ -426,214 +682,435 @@
             }
         });
 
-        // Infrastructure Grid
-        const assets = [
-            { name: "WS-HR-01", type: "Workstation", ip: "10.8.2.181", status: "green" },
-            { name: "SRV-IT-02", type: "Server", ip: "10.8.1.191", status: "gray" },
-            { name: "MOBILE-FIELD-07", type: "Mobile", ip: "10.8.2.50", status: "yellow" },
-            { name: "IOT-FAC-04", type: "IoT", ip: "10.8.3.33", status: "gray" },
-            { name: "WS-LEGAL-05", type: "Workstation", ip: "10.8.2.34", status: "yellow" },
-            { name: "WS-LEGAL-03", type: "Workstation", ip: "10.8.2.35", status: "green" },
-        ];
+        // Charts
+        let chartRadar, chartCategory, chartSeverity, chartOS;
 
-        const grid = document.getElementById('infrastructure-grid');
-        grid.innerHTML = '';
-        assets.forEach(asset => {
-            const color = asset.status === 'green' ? 'emerald' : asset.status === 'yellow' ? 'amber' : 'slate';
-            grid.innerHTML += `
-    <div class="bg-[#1e2937] border border-slate-700 rounded-2xl p-4 hover:border-cyan-500 transition-all">
-      <div class="flex justify-between">
-        <div>
-          <p class="font-mono text-sm">${asset.name}</p>
-          <p class="text-xs text-slate-500">${asset.type}</p>
-        </div>
-        <div class="w-3 h-3 rounded-full bg-${color}-500 mt-1"></div>
-      </div>
-      <p class="font-mono text-xs text-slate-500 mt-6">${asset.ip}</p>
-    </div>
-  `;
-        });
+        function initCharts() {
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', font: { size: 10 } }
+                    }
+                }
+            };
 
-        // Helper functions
-        function getTimeLabels() {
-            const labels = [];
-            const now = new Date();
-            for (let i = 6; i >= 0; i--) {
-                const t = new Date(now.getTime() - i * 60 * 60 * 1000);
-                labels.push(t.getHours() + ":00");
-            }
-            return labels;
-        }
-
-        function generateData(base, variance) {
-            return Array.from({ length: 7 }, () => Math.floor(base + Math.random() * variance));
-        }
-
-        // Update Charts
-        function updateCharts() {
-            const labels = getTimeLabels();
-
-            // Risk & Attack Charts Updater
-            if (chartCategory) {
-                chartCategory.data.datasets[0].data = [
-                    m.data.categories?.['Malicious'] || 0,
-                    m.data.categories?.['Suspicious'] || 0,
-                    m.data.categories?.['Benign'] || 0
-                ];
-                chartCategory.update('none');
-            }
-            if (chartSeverity) {
-                chartSeverity.data.datasets[0].data = [
-                    m.data.severity?.['Critical'] || 0,
-                    m.data.severity?.['High'] || 0,
-                    m.data.severity?.['Medium'] || 0,
-                    m.data.severity?.['Low'] || 0
-                ];
-                chartSeverity.update('none');
-            }
-            if (chartOS) {
-                chartOS.data.datasets[0].data = [
-                    m.data.os_distribution?.['Linux'] || 0,
-                    m.data.os_distribution?.['Windows'] || 0,
-                    m.data.os_distribution?.['macOS'] || 0
-                ];
-                chartOS.update('none');
-            }
-            if (chartRadar) {
-                chartRadar.data.datasets[0].data = [
-                    m.data.severity?.['Critical'] || 0,
-                    m.data.severity?.['High'] || 0,
-                    m.data.categories?.['Malicious'] || 0,
-                    m.data.categories?.['Suspicious'] || 0,
-                    m.data.os_distribution?.['Windows'] || 0,
-                    m.data.os_distribution?.['Linux'] || 0
-                ];
-                chartRadar.update('none');
-            }
-            if (alertChartInstance) alertChartInstance.destroy();
-            if (incidentChartInstance) incidentChartInstance.destroy();
-
-            // Alert Triage Trends
-            alertChartInstance = new Chart(document.getElementById('alertChart'), {
-                type: 'line',
+            // Radar Chart
+            chartRadar = new Chart(document.getElementById('chart-radar'), {
+                type: 'radar',
                 data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Critical', data: generateData(5, 12), borderColor: '#ef4444', tension: 0.4, borderWidth: 3 },
-                        { label: 'High', data: generateData(12, 15), borderColor: '#f97316', tension: 0.4 },
-                        { label: 'Total', data: generateData(45, 35), borderColor: '#22d3ee', borderWidth: 4, tension: 0.4 }
-                    ]
+                    labels: ['SQL Injection', 'XSS (Cross-Site Scripting)', 'Brute-Force Login', 'Ransomware C2 Beacon', 'Zero-Day Exploit (Log4Shell)', 'SSRF (Server-Side Request Forgery)', 'XXE Injection'],
+                    datasets: [{
+                        label: 'Attack Vector Frequency',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                        borderColor: '#22c55e',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#22c55e'
+                    }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 800 },
+                    ...commonOptions,
                     scales: {
-                        y: { grid: { color: '#334155' } },
-                        x: { grid: { color: '#334155' } }
-                    },
-                    plugins: {
-                        legend: { position: 'top', align: 'end', labels: { color: '#cbd5e1' } }
+                        r: {
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            pointLabels: { color: '#94a3b8' },
+                            ticks: { display: false }
+                        }
                     }
                 }
             });
 
-            // Incident Trends
-            incidentChartInstance = new Chart(document.getElementById('incidentChart'), {
-                type: 'line',
+            // Category Pie
+            chartCategory = new Chart(document.getElementById('chart-category'), {
+                type: 'doughnut',
                 data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Open', data: generateData(4, 8), borderColor: '#ef4444', tension: 0.4, borderWidth: 3 },
-                        { label: 'Investigating', data: generateData(10, 12), borderColor: '#f97316', tension: 0.4 },
-                        { label: 'Total', data: generateData(30, 25), borderColor: '#22d3ee', borderWidth: 4, tension: 0.4 }
-                    ]
+                    labels: ['Malicious', 'Suspicious', 'Benign'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#22c55e'],
+                        borderWidth: 0
+                    }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 800 },
+                    ...commonOptions,
+                    cutout: '70%'
+                }
+            });
+
+            // Severity Bar
+            chartSeverity = new Chart(document.getElementById('chart-severity'), {
+                type: 'bar',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        label: 'Events',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#ef4444', '#f97316', '#eab308', '#10b981'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    ...commonOptions,
                     scales: {
-                        y: { grid: { color: '#334155' } },
-                        x: { grid: { color: '#334155' } }
-                    },
-                    plugins: {
-                        legend: { position: 'top', align: 'end', labels: { color: '#cbd5e1' } }
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
                     }
                 }
             });
 
-            document.getElementById('last-updated').textContent = "Just now";
+            // OS Pie
+            chartOS = new Chart(document.getElementById('chart-os'), {
+                type: 'pie',
+                data: {
+                    labels: ['Linux', 'Windows', 'macOS'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#3b82f6', '#0ea5e9', '#6366f1'],
+                        borderWidth: 0
+                    }]
+                },
+                options: commonOptions
+            });
         }
 
-        // Auto refresh every 60 seconds
-        setInterval(updateCharts, 60000);
+        function updateCharts(stats) {
+            if (!stats) return;
 
-        // Manual Refresh
-        function refreshDashboard() {
-            updateCharts();
-            alert("Dashboard refreshed with latest security data!");
+            // Update Severity
+            const sevData = [
+                stats.severity['Critical'] || 0,
+                stats.severity['High'] || 0,
+                stats.severity['Medium'] || 0,
+                stats.severity['Low'] || 0
+            ];
+            chartSeverity.data.datasets[0].data = sevData;
+            chartSeverity.update();
+
+            // Update Categories
+            const catData = [
+                stats.categories['Malicious'] || 0,
+                stats.categories['Suspicious'] || 0,
+                stats.categories['Benign'] || 0
+            ];
+            chartCategory.data.datasets[0].data = catData;
+            chartCategory.update();
+
+            // Update OS
+            const osData = [
+                stats.os_distribution['Linux'] || 0,
+                stats.os_distribution['Windows'] || 0,
+                stats.os_distribution['macOS'] || 0
+            ];
+            chartOS.data.datasets[0].data = osData;
+            chartOS.update();
+
+            // Update Radar (Frequency approximation)
+            const radarLabels = ['SQL Injection', 'XSS (Cross-Site Scripting)', 'Brute-Force Login', 'Ransomware C2 Beacon', 'Zero-Day Exploit (Log4Shell)', 'SSRF (Server-Side Request Forgery)', 'XXE Injection'];
+            const radarData = radarLabels.map(label => {
+                return allAlerts.filter(a => a.summary && a.summary.includes(label)).length;
+            });
+            chartRadar.data.datasets[0].data = radarData;
+            chartRadar.update();
         }
 
-        // Live Time
+        /* --- UI Feeds & Interactions --- */
+        let allAlerts = [];
+        let recentCriticalAlerts = [];
+        let currentlySelectedAlert = null;
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let recentNotifications = {};
+
+        function createFeedCard(a) {
+            let sCol = a.severity === 'Critical' ? 'text-red-500 bg-red-500/10 border-red-500/20'
+                : a.severity === 'High' ? 'text-orange-500 bg-orange-500/10 border-orange-500/20'
+                    : a.severity === 'Medium' ? 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20'
+                        : 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+
+            const div = document.createElement('div');
+            div.className = `p-3 rounded-2xl border border-slate-700/50 bg-slate-800/30 hover:bg-slate-700/50 cursor-pointer transition-all flex flex-col gap-2 relative overflow-hidden`;
+            div.onclick = () => showIncidentDetails(a);
+            div.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-bold border ${sCol}">${a.severity.toUpperCase()}</span>
+                    <span class="text-[10px] text-slate-500 font-mono">${(a.timestamp || "").split(' ')[1] || "Now"}</span>
+                </div>
+                <p class="text-sm text-slate-200 font-medium line-clamp-1" title="${a.summary}">${a.summary}</p>
+                <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1 pt-2 border-t border-slate-700/50">
+                    <span>${a.source_ip || a.source_os}</span>
+                    <span>${a.category}</span>
+                </div>
+            `;
+            return div;
+        }
+
+        function appendToFeed(feedId, htmlElement) {
+            const container = document.getElementById(feedId);
+            if (!container) return;
+            // remove placeholder 
+            const placeholder = container.querySelector('.text-center');
+            if (placeholder) placeholder.remove();
+
+            container.prepend(htmlElement);
+            if (container.children.length > 50) {
+                container.lastElementChild.remove();
+            }
+        }
+
+        function showIncidentDetails(a) {
+            currentlySelectedAlert = a;
+            document.getElementById('empty-details').classList.add('hidden');
+            document.getElementById('active-details').classList.remove('hidden');
+
+            document.getElementById('detail-severity').textContent = a.severity.toUpperCase();
+            document.getElementById('detail-summary').textContent = a.summary;
+            document.getElementById('detail-time').textContent = a.timestamp || "Live Request";
+            document.getElementById('detail-risk').textContent = a.risk_score || 'N/A';
+            document.getElementById('detail-content').textContent = a.content || 'N/A';
+            document.getElementById('detail-ip').textContent = a.source_ip || a.source_os;
+            document.getElementById('detail-category').textContent = a.category;
+            const headersEl = document.getElementById('detail-headers');
+            if (a.raw_headers) {
+                headersEl.innerHTML = formatJSON(a.raw_headers);
+            } else {
+                headersEl.textContent = 'No raw headers available';
+            }
+
+            const sevEl = document.getElementById('detail-severity');
+            sevEl.className = `text-[10px] font-bold tracking-widest mb-1 ${a.severity === 'Critical' ? 'text-red-400' : a.severity === 'High' ? 'text-orange-400' : a.severity === 'Medium' ? 'text-yellow-400' : 'text-emerald-400'}`;
+        }
+
+        function formatJSON(obj) {
+            const sorted = Object.keys(obj).sort().reduce((acc, key) => { acc[key] = obj[key]; return acc; }, {});
+            let html = '<div class="space-y-1">';
+            for (const [key, val] of Object.entries(sorted)) {
+                html += `<div><span class="text-slate-500 font-bold">${key}:</span> <span class="text-cyan-400">"${val}"</span></div>`;
+            }
+            return html + '</div>';
+        }
+
+        function copyHeaders() {
+            if (!currentlySelectedAlert || !currentlySelectedAlert.raw_headers) return;
+            const text = JSON.stringify(currentlySelectedAlert.raw_headers, null, 2);
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.currentTarget;
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check text-green-400"></i> Copied';
+                setTimeout(() => { btn.innerHTML = original; }, 2000);
+            });
+        }
+
+        function downloadActiveReport() {
+            if (!currentlySelectedAlert) return;
+            if (!window.jspdf) { alert("PDF library loading."); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.setTextColor(34, 211, 238);
+            doc.text(`Incident Detail Report: #${currentlySelectedAlert.id}`, 14, 20);
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(100, 100, 100);
+            doc.text("Generated: " + new Date().toLocaleString(), 14, 28);
+
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Severity:   ${currentlySelectedAlert.severity}`, 14, 40);
+            doc.text(`Category:   ${currentlySelectedAlert.category}`, 14, 48);
+            doc.text(`Summary:    ${currentlySelectedAlert.summary}`, 14, 56);
+            doc.text(`IP / OS:    ${currentlySelectedAlert.source_ip || currentlySelectedAlert.source_os}`, 14, 64);
+            doc.text(`Risk Score: ${currentlySelectedAlert.risk_score || 'N/A'}`, 14, 72);
+            doc.text(`Time:       ${currentlySelectedAlert.timestamp}`, 14, 80);
+
+            doc.text(`Raw Details:`, 14, 95);
+            doc.setFontSize(8);
+            let splitText = doc.splitTextToSize(currentlySelectedAlert.content || 'N/A', 180);
+            doc.text(splitText, 14, 105);
+
+            if (currentlySelectedAlert.raw_headers) {
+                doc.addPage();
+                doc.setTextColor(34, 211, 238);
+                doc.setFontSize(14);
+                doc.text("Deep Forensic Analysis (Raw Headers)", 14, 20);
+                
+                const headerRows = Object.entries(currentlySelectedAlert.raw_headers).map(([k, v]) => [k, v]);
+                doc.autoTable({
+                    startY: 30,
+                    head: [['Header Key', 'Value']],
+                    body: headerRows,
+                    theme: 'striped',
+                    styles: { fontSize: 7, font: 'helvetica' },
+                    headStyles: { fillColor: [15, 23, 42] }
+                });
+            }
+
+            doc.save(`AegisCore_Forensic_Report_${currentlySelectedAlert.id}.pdf`);
+        }
+
         function updateTime() {
             setInterval(() => {
                 const timeEl = document.getElementById('current-time');
-                timeEl.textContent = new Date().toLocaleTimeString('en-US', {
+                if (timeEl) timeEl.textContent = new Date().toLocaleTimeString('en-US', {
                     hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
                 });
             }, 1000);
         }
 
-        // Initialize
-        window.onload = () => {
-            updateTime();
-            updateCharts();
-        };
-
-        // -----------------------------------------
-        // WebSocket & Real-time Alerts Integration
-        // -----------------------------------------
-
-        let currentFilter = 'all';
-        let searchQuery = '';
-        let chartCategory = null;
-        let chartSeverity = null;
-        let chartOS = null;
-        let chartRadar = null;
-
+        // Threat Analytics Table
         function renderAlerts() {
+            if (isPausedAnalysis && currentFilter === 'all' && searchQuery === '') return;
+
             const tb = document.getElementById('alert-tbody');
             if (!tb) return;
             tb.innerHTML = '';
             let q = searchQuery.toLowerCase();
             allAlerts.filter(a => (currentFilter === 'all' || a.severity === currentFilter) &&
-                (q === '' || a.summary.toLowerCase().includes(q) || a.category.toLowerCase().includes(q) || a.source_os.toLowerCase().includes(q)))
+                (q === '' || (a.summary && a.summary.toLowerCase().includes(q)) || (a.category && a.category.toLowerCase().includes(q)) || (a.source_os && a.source_os.toLowerCase().includes(q))))
                 .slice(0, 100).forEach(a => {
                     let sCol = a.severity === 'Critical' ? 'text-red-400 border-red-500/30 bg-red-500/10'
                         : a.severity === 'High' ? 'text-orange-400 border-orange-500/30 bg-orange-500/10'
                             : a.severity === 'Medium' ? 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'
                                 : 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
 
-                    let rColor = a.risk_score >= 80 ? '#ef4444' : a.risk_score >= 60 ? '#f97316' : a.risk_score >= 40 ? '#eab308' : '#10b981';
+                    let rt = a.risk_score || 0;
+                    let rColor = rt >= 80 ? '#ef4444' : rt >= 60 ? '#f97316' : rt >= 40 ? '#eab308' : '#10b981';
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-[#1e2937] transition-colors";
+                    tr.className = "hover:bg-[#1e2937] transition-colors cursor-pointer group";
+                    tr.onclick = (e) => {
+                        if (e.target.type === 'checkbox' || e.target.closest('.checkbox-cell')) return;
+                        showDeepAnalysisModal(a.id);
+                    };
                     tr.innerHTML = `
-                <td class="px-6 py-3 border-none">#${a.id}</td>
-                <td class="px-4 py-3 border-none text-slate-400">${a.timestamp.split(' ')[1]}</td>
-                <td class="px-4 py-3 border-none"><span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px] border border-slate-700">${a.source_os}</span></td>
+                <td class="px-6 py-3 border-none flex mt-1 items-center justify-center checkbox-cell">
+                    <input type="checkbox" class="alert-checkbox w-4 h-4 bg-slate-800 border border-slate-700 rounded text-cyan-500 focus:ring-cyan-500 cursor-pointer" value="${a.id}" onclick="event.stopPropagation()">
+                </td>
+                <td class="px-4 py-3 border-none text-slate-400 font-mono text-xs">#${a.id}</td>
+                <td class="px-4 py-3 border-none text-slate-400 text-xs">${(a.timestamp || "").split(' ')[1] || ""}</td>
+                <td class="px-4 py-3 border-none"><span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px] border border-slate-700 font-mono">${a.source_os}</span></td>
                 <td class="px-4 py-3 border-none"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${sCol}">${a.severity.toUpperCase()}</span></td>
                 <td class="px-4 py-3 border-none text-slate-400 text-xs">${a.category}</td>
-                <td class="px-4 py-3 border-none text-slate-200 truncate max-w-[250px]" title="${a.summary}">${a.summary}</td>
+                <td class="px-4 py-3 border-none text-slate-200 truncate max-w-[250px] group-hover:text-cyan-400 transition-colors" title="${a.summary}">${a.summary}</td>
                 <td class="px-6 py-3 border-none flex items-center justify-end gap-2">
                     <span class="inline-block w-20 h-1.5 rounded-full bg-slate-800 overflow-hidden relative">
-                        <span class="absolute top-0 left-0 h-full" style="width: ${a.risk_score}%; background: ${rColor}; box-shadow: 0 0 10px ${rColor}"></span>
+                        <span class="absolute top-0 left-0 h-full" style="width: ${rt}%; background: ${rColor}; box-shadow: 0 0 10px ${rColor}"></span>
                     </span>
-                    <span class="text-xs w-6 text-right font-mono" style="color: ${rColor}">${a.risk_score}</span>
+                    <span class="text-xs w-6 text-right font-mono" style="color: ${rColor}">${rt}</span>
                 </td>
             `;
                     tb.appendChild(tr);
                 });
+        }
+
+        function closeForensicModal() {
+            const modal = document.getElementById('forensic-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function showDeepAnalysisModal(alertId) {
+            const alert = allAlerts.find(a => a.id === alertId);
+            if (!alert) return;
+
+            document.getElementById('modal-severity-badge').textContent = alert.severity.toUpperCase();
+            document.getElementById('modal-severity-badge').className = `px-2 py-1 ${alert.severity === 'Critical' ? 'bg-red-500/20 text-red-500' : 'bg-orange-500/20 text-orange-400'} text-[10px] font-bold rounded-lg tracking-widest uppercase`;
+            document.getElementById('modal-summary').textContent = alert.summary;
+            document.getElementById('modal-meta').textContent = `ID: #${alert.id} • ${alert.timestamp}`;
+            document.getElementById('modal-ip').textContent = alert.source_ip || alert.source_os;
+            document.getElementById('modal-risk').textContent = `${alert.risk_score || 0}/100`;
+            document.getElementById('modal-risk').className = `font-mono text-sm ${alert.risk_score >= 80 ? 'text-red-500' : 'text-orange-500'} font-bold`;
+
+            const headers = document.getElementById('modal-headers');
+            headers.textContent = JSON.stringify(alert.raw_headers || { "Forensic": "No extended metadata available" }, null, 4);
+
+            const downloadBtn = document.getElementById('modal-download-btn');
+            downloadBtn.onclick = () => downloadRawJSON(alert.id);
+
+            const modal = document.getElementById('forensic-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function downloadRawJSON(alertId) {
+            const alert = alertId ? allAlerts.find(a => a.id === alertId) : currentlySelectedAlert;
+            if (!alert || !alert.raw_headers) {
+                alert("No raw forensic headers available for this incident.");
+                return;
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+                incident_id: alert.id,
+                timestamp: alert.timestamp,
+                severity: alert.severity,
+                category: alert.category,
+                summary: alert.summary,
+                raw_headers: alert.raw_headers
+            }, null, 4));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `AegisCore_Forensic_Data_${alert.id}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function toggleAllCheckboxes(source) {
+            let checkboxes = document.querySelectorAll('.alert-checkbox');
+            for (let i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+
+        function downloadAISummary() {
+            const checkboxes = document.querySelectorAll('.alert-checkbox:checked');
+            const selected = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            if (selected.length === 0) {
+                alert("Please select at least one network traffic log to generate an AI summary report.");
+                return;
+            }
+
+            const selectedAlerts = allAlerts.filter(a => selected.includes(a.id));
+
+            if (!window.jspdf) { alert("PDF library loading. Please wait."); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Branding
+            doc.setFillColor(15, 23, 42); // slate-900 background
+            doc.rect(0, 0, 210, 40, 'F');
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(139, 92, 246); // Purple 500
+            doc.text("AegisCore - AI Summary Report", 14, 20);
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(200, 200, 200);
+            doc.text(`Date Generated: ${new Date().toLocaleString()}`, 14, 28);
+            doc.text(`Events Aggregated: ${selected.length}`, 14, 34);
+
+            doc.autoTable({
+                startY: 45,
+                head: [['ID', 'Severity', 'Risk', 'Target/OS', 'Summary', 'Deep Metadata']],
+                body: selectedAlerts.map(a => [
+                    "#" + a.id,
+                    a.severity,
+                    a.risk_score || "N/A",
+                    a.source_ip || a.source_os,
+                    a.summary,
+                    a.raw_headers ? `UA: ${a.raw_headers['User-Agent']?.substring(0, 30)}...` : 'N/A'
+                ]),
+                theme: 'grid',
+                styles: { fontSize: 7, font: 'helvetica' },
+                headStyles: { fillColor: [139, 92, 246], textColor: 255 },
+                alternateRowStyles: { fillColor: [248, 250, 252] }
+            });
+
+            doc.save("AegisCore_Tactical_Summary.pdf");
         }
 
         function filterAlerts(f, e) {
@@ -652,275 +1129,119 @@
             renderAlerts();
         }
 
-        function exportPDF() {
-            if (!window.jspdf) { alert("PDF library loading."); return; }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(18);
-            doc.setTextColor(220, 38, 38);
-            doc.text("AegisCore Dashboard - Incident Report", 14, 20);
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(100, 100, 100);
-            doc.text("Generated: " + new Date().toLocaleString(), 14, 28);
-
-            const last10 = recentCriticalAlerts.slice(0, 15);
-            if (last10.length === 0) doc.text("No critical alerts recorded.", 14, 40);
-            else {
-                doc.autoTable({
-                    startY: 35,
-                    head: [['Time', 'OS', 'Category', 'Summary', 'Risk']],
-                    body: last10.map(a => [a.timestamp.split(' ')[1], a.source_os, a.category, a.summary, a.risk_score]),
-                    theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [220, 38, 38] }
-                });
-            }
-            doc.save("AegisCore Dashboard_Export.pdf");
-        }
-
-        function initDashboardCharts() {
-            Chart.defaults.color = '#94a3b8';
-            Chart.defaults.font.family = 'Inter';
-            const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } }, borderDash: [5, 5] };
-
-            // Doughnut 1
-            const elCat = document.getElementById('chart-category');
-            if (elCat) {
-                chartCategory = new Chart(elCat, {
-                    type: 'doughnut',
-                    data: { labels: ['Malicious', 'Suspicious', 'Benign'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#ef4444', '#f97316', '#10b981'], borderWidth: 0 }] },
-                    options: { ...opts, cutout: '75%' }
-                });
-            }
-            // Bar
-            const elSev = document.getElementById('chart-severity');
-            if (elSev) {
-                chartSeverity = new Chart(elSev, {
-                    type: 'bar',
-                    data: { labels: ['Critical', 'High', 'Medium', 'Low'], datasets: [{ label: 'Events', data: [0, 0, 0, 0], backgroundColor: ['#ef4444', '#f97316', '#eab308', '#10b981'], borderRadius: 4 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#1e2937' } }, x: { grid: { display: false } } } }
-                });
-            }
-            // Doughnut 2
-            const elOS = document.getElementById('chart-os');
-            if (elOS) {
-                chartOS = new Chart(elOS, {
-                    type: 'doughnut',
-                    data: { labels: ['Linux', 'Windows', 'macOS'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#eab308', '#3b82f6', '#94a3b8'], borderWidth: 0 }] },
-                    options: { ...opts, cutout: '75%' }
-                });
-            }
-            // Radar
-            const elRad = document.getElementById('chart-radar');
-            if (elRad) {
-                chartRadar = new Chart(elRad, {
-                    type: 'radar',
-                    data: {
-                        labels: ['Critical', 'High', 'Malicious', 'Suspicious', 'Windows', 'Linux'],
-                        datasets: [{
-                            label: 'Network Flow',
-                            data: [0, 0, 0, 0, 0, 0],
-                            backgroundColor: 'rgba(34, 211, 238, 0.2)',
-                            borderColor: '#22d3ee',
-                            pointBackgroundColor: '#22d3ee',
-                            borderWidth: 1.5,
-                            pointRadius: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            r: {
-                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                                pointLabels: { color: '#94a3b8', font: { size: 10 } },
-                                ticks: { display: false }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        let allAlerts = [];
-        let recentCriticalAlerts = [];
-        let recentNotifications = {};
-
         function showToast(alert) {
             let isCrit = alert.severity === 'Critical';
             let bg = isCrit ? 'bg-red-950/90 border-red-500/50 text-red-100' : 'bg-slate-800 border-slate-700 text-slate-300 shadow-xl border';
 
+            const container = document.getElementById('toast-container');
+            container.innerHTML = ''; // Single notification only
+
             const t = document.createElement('div');
             t.className = `p-4 rounded-xl border backdrop-blur-md transition-all translate-x-[150%] duration-500 ${bg}`;
             t.innerHTML = `
-        <div class="text-[10px] font-bold tracking-widest mb-1 ${isCrit ? 'text-red-400' : 'text-cyan-400'}">${alert.severity.toUpperCase()} DETECTED</div>
-        <div class="text-sm font-medium leading-tight">${alert.summary}</div>
-    `;
-            document.getElementById('toast-container').prepend(t);
+                <div class="text-[10px] font-bold tracking-widest mb-1 ${isCrit ? 'text-red-400' : 'text-cyan-400'}">${alert.severity.toUpperCase()} DETECTED</div>
+                <div class="text-sm font-medium leading-tight">${alert.summary}</div>
+            `;
+            container.prepend(t);
             requestAnimationFrame(() => t.style.transform = 'translateX(0)');
             setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.remove(), 500); }, isCrit ? 8000 : 4000);
         }
 
-        function renderRecentCritical() {
-            const container = document.getElementById('recent-incidents-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            recentCriticalAlerts.slice(0, 5).forEach(a => {
-                let borderColor = a.severity === 'Critical' ? 'border-red-500' : 'border-orange-500';
-                container.innerHTML += `
-              <div class="bg-[#1e2937] border-l-4 ${borderColor} p-5 rounded-r-3xl transition-all">
-                <p class="font-medium text-slate-200">${a.summary}</p>
-                <p class="text-xs text-slate-400 mt-1">${a.category} • ${a.timestamp.split(' ')[1]}</p>
-              </div>
-        `;
-            });
+        function appendToFeed(containerId, card) {
+            const container = document.getElementById(containerId);
+            if (containerId === 'feed-critical') {
+                // Per-attack-type deduplication: remove old version of same attack
+                const summary = card.querySelector('.text-sm')?.textContent;
+                if (summary) {
+                    const items = container.querySelectorAll('.glass');
+                    items.forEach(item => {
+                        if (item.querySelector('.text-sm')?.textContent === summary) {
+                            item.remove();
+                        }
+                    });
+                }
+            }
+            container.prepend(card);
         }
 
-
-        function manualStartScan() {
-            fetch("/api/start-scan", { method: "POST" }).then(res => res.json()).then(data => {
-                console.log("Scan started:", data);
-                alert("AI Analysis Simulation Started!");
-            });
-        }
+        let lastFeedAlerts = {}; // Tracks { [summary]: time }
 
         function initWebsocket() {
-            const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/alerts`);
-            ws.onmessage = e => {
-                const m = JSON.parse(e.data);
-                if (m.type === 'stats') {
-                    const elTotal = document.getElementById('stat-total');
-                    const elCrit = document.getElementById('stat-critical');
-                    const elSusp = document.getElementById('stat-suspicious');
-                    const elReview = document.getElementById('stat-review');
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const ws = new WebSocket(`${protocol}//${window.location.host}/ws/alerts`);
 
-                    if (elTotal) elTotal.textContent = (m.data.total || 0).toLocaleString();
-                    if (elCrit) elCrit.textContent = ((m.data.severity?.['Critical'] || 0) + (m.data.severity?.['High'] || 0)).toLocaleString();
-                    if (elSusp) elSusp.textContent = (m.data.categories?.['Suspicious'] || 0).toLocaleString();
-                    if (elReview) elReview.textContent = (m.data.categories?.['Malicious'] || 0).toLocaleString();
-
-                    const elTriage = document.getElementById('stat-triage');
-                    let autoTriaged = (m.data.categories?.['Benign'] || 0) + (m.data.categories?.['Suspicious'] || 0);
-                    let safeRate = m.data.total > 0 ? Math.round((autoTriaged / m.data.total) * 100) : 100;
-                    if (elTriage) elTriage.textContent = safeRate + "%";
-
-                    if (m.data.infrastructure && m.data.infrastructure.length > 0) {
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                
+                if (msg.type === 'stats') {
+                    updateCharts(msg.data);
+                    
+                    // Update Infrastructure Grid
+                    if (msg.data.infrastructure && msg.data.infrastructure.length > 0) {
                         const grid = document.getElementById('infrastructure-grid');
-                        if (grid) {
+                        if (grid && grid.children.length === 0) { // Render once
                             grid.innerHTML = '';
-                            m.data.infrastructure.forEach(asset => {
+                            msg.data.infrastructure.forEach(asset => {
                                 const color = asset.status === 'green' ? 'emerald' : asset.status === 'yellow' ? 'amber' : 'red';
                                 grid.innerHTML += `
                                 <div class="bg-[#1e2937] border border-slate-700 rounded-2xl p-4 hover:border-cyan-500 transition-all">
                                   <div class="flex justify-between">
                                     <div>
-                                      <p class="font-mono text-sm">${asset.name}</p>
-                                      <p class="text-xs text-slate-500">${asset.type}</p>
+                                      <p class="font-mono text-sm uppercase tracking-tighter">${asset.name}</p>
+                                      <p class="text-[10px] text-slate-500 font-bold">${asset.type}</p>
                                     </div>
-                                    <div class="w-3 h-3 rounded-full bg-${color}-500 mt-1"></div>
+                                    <div class="w-2 h-2 rounded-full bg-${color}-500 mt-1 shadow-lg shadow-${color}-500/40"></div>
                                   </div>
-                                  <p class="font-mono text-xs text-slate-500 mt-6">${asset.ip}</p>
+                                  <p class="font-mono text-[10px] text-slate-500 mt-4">${asset.ip}</p>
                                 </div>
                                 `;
                             });
                         }
                     }
-
-                    let crit = m.data.severity?.['Critical'] || 0;
-                    let high = m.data.severity?.['High'] || 0;
-                    let total = m.data.total || 0;
-
-                    // Risk & Attack Charts Updater
-                    if (chartCategory) {
-                        chartCategory.data.datasets[0].data = [
-                            m.data.categories?.['Malicious'] || 0,
-                            m.data.categories?.['Suspicious'] || 0,
-                            m.data.categories?.['Benign'] || 0
-                        ];
-                        chartCategory.update('none');
-                    }
-                    if (chartSeverity) {
-                        chartSeverity.data.datasets[0].data = [
-                            m.data.severity?.['Critical'] || 0,
-                            m.data.severity?.['High'] || 0,
-                            m.data.severity?.['Medium'] || 0,
-                            m.data.severity?.['Low'] || 0
-                        ];
-                        chartSeverity.update('none');
-                    }
-                    if (chartOS) {
-                        chartOS.data.datasets[0].data = [
-                            m.data.os_distribution?.['Linux'] || 0,
-                            m.data.os_distribution?.['Windows'] || 0,
-                            m.data.os_distribution?.['macOS'] || 0
-                        ];
-                        chartOS.update('none');
-                    }
-                    if (chartRadar) {
-                        chartRadar.data.datasets[0].data = [
-                            m.data.severity?.['Critical'] || 0,
-                            m.data.severity?.['High'] || 0,
-                            m.data.categories?.['Malicious'] || 0,
-                            m.data.categories?.['Suspicious'] || 0,
-                            m.data.os_distribution?.['Windows'] || 0,
-                            m.data.os_distribution?.['Linux'] || 0
-                        ];
-                        chartRadar.update('none');
-                    }
-                    if (alertChartInstance) {
-                        alertChartInstance.data.datasets[0].data.push(crit);
-                        alertChartInstance.data.datasets[0].data.shift();
-                        alertChartInstance.data.datasets[1].data.push(high);
-                        alertChartInstance.data.datasets[1].data.shift();
-                        alertChartInstance.data.datasets[2].data.push(total);
-                        alertChartInstance.data.datasets[2].data.shift();
-                        alertChartInstance.update('none');
-                    }
-                    if (incidentChartInstance) {
-                        incidentChartInstance.data.datasets[0].data.push(crit);
-                        incidentChartInstance.data.datasets[0].data.shift();
-                        incidentChartInstance.data.datasets[1].data.push(high);
-                        incidentChartInstance.data.datasets[1].data.shift();
-                        incidentChartInstance.data.datasets[2].data.push(total);
-                        incidentChartInstance.data.datasets[2].data.shift();
-                        incidentChartInstance.update('none');
-                    }
-                }
-                else if (m.type === 'alert') {
-                    allAlerts.unshift(m.data);
+                } else if (msg.type === 'alert') {
+                    const alert = msg.data;
+                    allAlerts.unshift(alert);
                     if (allAlerts.length > 2000) allAlerts.pop();
 
-                    if (m.data.severity === 'Critical' || m.data.severity === 'High') {
-                        recentCriticalAlerts.unshift(m.data);
-                        if (recentCriticalAlerts.length > 20) recentCriticalAlerts.pop();
-                        renderRecentCritical();
+                    // Dashboard Feed logic
+                    const card = createFeedCard(alert);
+                    
+                    // Deduplication logic for Critical/High Feed
+                    if (alert.severity === 'Critical' || alert.severity === 'High') {
+                        const now = Date.now();
+                        let isDuplicate = lastFeedAlerts[alert.summary] && (now - lastFeedAlerts[alert.summary] < 10000);
+                        
+                        if (!isDuplicate) {
+                            lastFeedAlerts[alert.summary] = now;
+                            appendToFeed('feed-critical', card);
+                            showToast(alert);
+
+                            // Notifications (One per attack type in bell)
+                            if (!unreadCriticalAlerts.find(a => a.summary === alert.summary)) {
+                                if (alert.severity === 'Critical') {
+                                    unreadCriticalAlerts.unshift(alert);
+                                    if (unreadCriticalAlerts.length > 20) unreadCriticalAlerts.pop();
+                                    updateNotificationUI();
+                                }
+                            }
+                        }
                     }
 
-                    const alertKey = m.data.summary || m.data.category;
-                    const now = Date.now();
-                    if (!recentNotifications[alertKey] || (now - recentNotifications[alertKey] > 10000)) {
-                        recentNotifications[alertKey] = now;
-                        showToast(m.data);
-                        const badge = document.getElementById('bell-badge');
-                        if (badge) badge.classList.remove('hidden');
+                    // Live Network always shows everything (the "Real" experience)
+                    appendToFeed('feed-all', createFeedCard(alert));
+
+                    // Update Analytics table if visible
+                    if (currentTab === 2) {
+                        renderAlerts();
                     }
                 }
             };
         }
-        // Hook into original window.onload if it exists
-        const originalOnLoad = window.onload;
+
         window.onload = () => {
-            if (originalOnLoad) originalOnLoad();
-            initDashboardCharts();
+            initCharts();
+            updateTime();
             initWebsocket();
-            // Auto-start simulation on dashboard load
-            fetch("/api/start-scan", { method: "POST" })
-                .then(r => r.json())
-                .then(d => console.log("[AegisCore] Scan auto-started:", d.status))
-                .catch(e => console.warn("[AegisCore] Scan trigger failed:", e));
         };
 
     </script>
