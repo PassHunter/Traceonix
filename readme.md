@@ -42,7 +42,7 @@ Open your web browser and navigate to:
 
 ## 👥 Team Information
 
-**Team Name:** Vidhit Technologies (SIH-2025 · PS0202)
+**Team Name:** Traceonix
 
 **Team Members:**
 - Ayush Madavi
