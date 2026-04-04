@@ -17,6 +17,10 @@ from log_parser import load_all_logs
 from classifier import classify_all, classify_single, get_stats
 from intelligence import aegis_ai
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # ─────────────────────────────────────────────────────────────
 # Initialize & Classify on Startup
@@ -256,7 +260,9 @@ def serve_login():
 async def authenticate(request: Request):
     """Basic mock authentication."""
     data = await request.json()
-    if data.get("username") == "admin" and data.get("password") == "password123":
+    admin_user = os.getenv("SOC_ADMIN_USER", "admin")
+    admin_pass = os.getenv("SOC_ADMIN_PASS", "password123")
+    if data.get("username") == admin_user and data.get("password") == admin_pass:
         return JSONResponse(content={"status": "success"})
     return JSONResponse(status_code=401, content={"status": "unauthorized"})
 

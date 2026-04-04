@@ -4,6 +4,16 @@
 
 AegisCore is a high-performance, real-time SOC monitoring platform that utilizes AI (via OpenRouter/Gemini) to classify network traffic, analyze forensic metadata, and provide actionable security intelligence. It features a modern, reactive dashboard with live WebSocket updates and an interactive attack simulator for testing detection capabilities.
 
+## ⚙️ Configuration
+
+AegisCore uses environment variables for sensitive data. Create a `.env` file in the root directory:
+
+```env
+OPENROUTER_API_KEY=your_key_here
+SOC_ADMIN_USER=admin
+SOC_ADMIN_PASS=password123
+```
+
 ---
 
 ## 🚀 Execution Steps

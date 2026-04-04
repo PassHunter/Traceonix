@@ -1,11 +1,15 @@
 import os
+from dotenv import load_dotenv
 from openai import AsyncOpenAI
 import asyncio
 import json
 from datetime import datetime
 
+# Load environment variables
+load_dotenv()
+
 # Initialize OpenRouter Client (OpenAI-Compatible)
-API_KEY = os.environ.get("OPENROUTER_API_KEY", "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")
+API_KEY = os.environ.get("OPENROUTER_API_KEY")
 client = AsyncOpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=API_KEY,
