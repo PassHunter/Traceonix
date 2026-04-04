@@ -278,6 +278,40 @@
                                         </div>
                                         <div id="detail-headers" class="text-[11px] text-cyan-400/70 font-mono whitespace-pre-wrap max-h-60 overflow-y-auto custom-scrollbar bg-black/20 p-3 rounded-xl border border-cyan-500/10"></div>
                                     </div>
+
+                                    <!-- Aegis Forensic AI Analyst Section -->
+                                    <div class="bg-indigo-950/20 border border-indigo-500/20 rounded-2xl p-4 relative overflow-hidden group">
+                                        <div class="absolute top-0 right-0 p-3">
+                                            <div class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></div>
+                                        </div>
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
+                                                <i class="fa-solid fa-microchip text-indigo-400 text-sm"></i>
+                                            </div>
+                                            <h4 class="text-sm font-bold text-indigo-300 uppercase tracking-widest">Aegis Forensic AI</h4>
+                                        </div>
+                                        
+                                        <div id="ai-placeholder" class="py-2">
+                                            <button onclick="runAIScan()" id="ai-scan-btn" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-all border border-indigo-400/30 shadow-lg shadow-indigo-900/40 flex items-center justify-center gap-2">
+                                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                                RUN DEEP AI FORENSIC SCAN
+                                            </button>
+                                        </div>
+
+                                        <div id="ai-results" class="hidden flex flex-col h-[400px]">
+                                            <div id="chat-history" class="flex-1 overflow-y-auto space-y-4 mb-4 p-2 custom-scrollbar">
+                                                <!-- Messages will appear here -->
+                                            </div>
+                                            <div class="relative group">
+                                                <input id="chat-input" type="text" placeholder="Inquire about this forensic event..." 
+                                                    class="w-full bg-slate-900/80 border border-indigo-500/30 rounded-xl py-3 pl-4 pr-12 text-sm text-slate-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all placeholder-slate-500"
+                                                    onkeydown="if(event.key==='Enter') sendChatMessage()">
+                                                <button onclick="sendChatMessage()" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition-all shadow-lg shadow-indigo-900/20 active:scale-90">
+                                                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4 mb-6">
                                     <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
@@ -376,30 +410,95 @@
                         </button>
                     </div>
 
-                    <div class="glass border border-slate-700 rounded-3xl overflow-hidden h-[600px] flex flex-col">
-                        <div class="overflow-y-auto custom-scrollbar flex-1">
-                            <table class="w-full text-left border-collapse">
-                                <thead
-                                    class="sticky top-0 bg-[#0f172a] shadow-md z-10 text-xs text-slate-400 uppercase tracking-wider">
-                                    <tr>
-                                        <th class="px-6 py-4 font-semibold border-b border-slate-700 w-10">
-                                            <input type="checkbox" id="selectAll"
-                                                class="w-4 h-4 bg-slate-800 border border-slate-700 rounded text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-900 cursor-pointer"
-                                                onclick="toggleAllCheckboxes(this)">
-                                        </th>
-                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">ID</th>
-                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">TIME</th>
-                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">SOURCE</th>
-                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">SEVERITY</th>
-                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">CATEGORY</th>
-                                        <th class="px-4 py-4 font-semibold border-b border-slate-700">SUMMARY</th>
-                                        <th class="px-6 py-4 font-semibold border-b border-slate-700 text-right">RISK
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="alert-tbody" class="text-sm divide-y divide-slate-800">
-                                </tbody>
-                            </table>
+                    <div class="relative flex-1 min-h-0 flex gap-6">
+                        <!-- Alert Table -->
+                        <div class="glass border border-slate-700 rounded-3xl overflow-hidden h-[600px] flex flex-col flex-1">
+                            <div class="overflow-y-auto custom-scrollbar flex-1">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="sticky top-0 bg-[#0f172a] shadow-md z-10 text-xs text-slate-400 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="px-6 py-4 font-semibold border-b border-slate-700 w-10">
+                                                <input type="checkbox" id="selectAll" class="w-4 h-4 bg-slate-800 border border-slate-700 rounded text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-900 cursor-pointer" onclick="toggleAllCheckboxes(this)">
+                                            </th>
+                                            <th class="px-4 py-4 font-semibold border-b border-slate-700">ID</th>
+                                            <th class="px-4 py-4 font-semibold border-b border-slate-700">TIME</th>
+                                            <th class="px-4 py-4 font-semibold border-b border-slate-700">SOURCE</th>
+                                            <th class="px-4 py-4 font-semibold border-b border-slate-700">SEVERITY</th>
+                                            <th class="px-4 py-4 font-semibold border-b border-slate-700">CATEGORY</th>
+                                            <th class="px-4 py-4 font-semibold border-b border-slate-700">SUMMARY</th>
+                                            <th class="px-6 py-4 font-semibold border-b border-slate-700 text-right">RISK</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="alert-tbody" class="text-sm divide-y divide-slate-800">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Quick Forensic Preview Panel (Centered Modal) -->
+                        <div id="quick-preview-overlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                            <div id="quick-preview-panel" class="w-full max-w-2xl h-[600px] glass border border-slate-700 rounded-3xl flex flex-col overflow-hidden shadow-2xl shadow-cyan-500/10 animate-in zoom-in-95 duration-300">
+                                <div class="p-4 border-b border-slate-700 bg-slate-800/40 flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_10px_#06b6d4]"></div>
+                                        <h3 class="text-xs font-bold text-cyan-400 tracking-widest uppercase">Quick Forensic Preview</h3>
+                                    </div>
+                                    <button onclick="toggleQuickPreview()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all flex items-center justify-center border border-slate-700">
+                                        <i class="fa-solid fa-xmark text-xs"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="flex-1 p-6 space-y-6 overflow-y-auto custom-scrollbar bg-slate-900/10">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <h4 id="preview-summary" class="text-sm font-bold text-white uppercase italic leading-tight tracking-wide">Analysing System Event...</h4>
+                                            <div class="flex gap-4 mt-2">
+                                                <p id="preview-meta" class="text-[10px] text-slate-500 font-mono">ID: #000 • Timestamp</p>
+                                                <div id="preview-severity" class="text-[10px] font-bold text-red-500 uppercase flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> CRITICAL</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right ml-6 p-3 px-5 rounded-2xl bg-black/30 border border-slate-800">
+                                            <p class="text-[9px] font-bold text-slate-500 uppercase mb-0.5">Risk Score</p>
+                                            <p id="preview-risk" class="text-xl font-bold text-red-500 font-mono shadow-glow">0/100</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="p-4 rounded-2xl bg-black/40 border border-slate-800 flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-500 border border-cyan-500/20"><i class="fa-solid fa-network-wired"></i></div>
+                                            <div>
+                                                <p class="text-[9px] font-bold text-slate-500 uppercase">Target Surface</p>
+                                                <p id="preview-ip" class="font-mono text-sm text-cyan-400">0.0.0.0</p>
+                                            </div>
+                                        </div>
+                                        <div class="p-4 rounded-2xl bg-black/40 border border-slate-800 flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 border border-purple-500/20"><i class="fa-solid fa-fingerprint"></i></div>
+                                            <div>
+                                                <p class="text-[9px] font-bold text-slate-500 uppercase">Forensic Identity</p>
+                                                <p class="font-mono text-sm text-purple-400">SOC-NODE-ALPHA</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-5 rounded-2xl bg-black/50 border border-slate-800 flex-1 min-h-0 flex flex-col shadow-inner">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fa-solid fa-code text-cyan-500 text-xs"></i>
+                                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Metadata Payload (Headers)</p>
+                                            </div>
+                                            <button onclick="copyRawHeaders()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-[9px] text-slate-300 hover:text-cyan-400 transition-all uppercase font-bold rounded-lg border border-slate-700"><i class="fa-solid fa-copy mr-1.5"></i> Copy Base64</button>
+                                        </div>
+                                        <div id="preview-headers" class="font-mono text-xs text-cyan-500/90 overflow-y-auto custom-scrollbar flex-1 whitespace-pre-wrap leading-relaxed"></div>
+                                    </div>
+
+                                    <div class="pt-4 border-t border-slate-800 flex gap-4">
+                                        <button onclick="downloadReport()" class="flex-1 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-white text-[10px] font-bold py-3.5 rounded-xl transition-all border border-slate-700 flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                                            <i class="fa-solid fa-file-export text-cyan-400"></i> EXPORT FORENSIC BUNDLE
+                                        </button>
+                                        <button onclick="toggleQuickPreview()" class="flex-px px-6 bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] font-bold rounded-xl border border-slate-700 transition-all">CLOSE</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -880,9 +979,109 @@
             } else {
                 headersEl.textContent = 'No raw headers available';
             }
-
             const sevEl = document.getElementById('detail-severity');
-            sevEl.className = `text-[10px] font-bold tracking-widest mb-1 ${a.severity === 'Critical' ? 'text-red-400' : a.severity === 'High' ? 'text-orange-400' : a.severity === 'Medium' ? 'text-yellow-400' : 'text-emerald-400'}`;
+            if (sevEl) sevEl.className = `text-[10px] font-bold tracking-widest mb-1 ${a.severity === 'Critical' ? 'text-red-400' : a.severity === 'High' ? 'text-orange-400' : a.severity === 'Medium' ? 'text-yellow-400' : 'text-emerald-400'}`;            // Reset AI Panel
+            const aiPlac = document.getElementById('ai-placeholder');
+            const aiRes = document.getElementById('ai-results');
+            if (aiPlac) aiPlac.classList.remove('hidden');
+            if (aiRes) aiRes.classList.add('hidden');
+            
+            const chatHistory = document.getElementById('chat-history');
+            if (chatHistory) chatHistory.innerHTML = '';
+            
+            const aiBtn = document.getElementById('ai-scan-btn');
+            if (aiBtn) {
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> RUN DEEP AI FORENSIC SCAN';
+            }
+        }
+
+        async function runAIScan() {
+            if (!currentlySelectedAlert) return;
+            const btn = document.getElementById('ai-scan-btn');
+            if (!btn) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENGAGING AEGIS INTELLIGENCE...';
+
+            try {
+                const res = await fetch(`/api/ai/analyze/${currentlySelectedAlert.id}`);
+                const data = await res.json();
+                
+                document.getElementById('ai-placeholder')?.classList.add('hidden');
+                document.getElementById('ai-results')?.classList.remove('hidden');
+
+                // Initial Gemini Explanation
+                appendChatMessage('ai', data.analysis);
+
+            } catch (e) {
+                btn.textContent = 'INTELLIGENCE UPLINK FAILED';
+                console.error(e);
+            }
+        }
+
+        async function sendChatMessage() {
+            if (!currentlySelectedAlert) return;
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            appendChatMessage('user', message);
+
+            const history = document.getElementById('chat-history');
+            const loadingBubble = appendChatMessage('ai', '<i class="fa-solid fa-spinner fa-spin"></i> Thinking...');
+
+            try {
+                const res = await fetch(`/api/ai/chat/${currentlySelectedAlert.id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await res.json();
+                
+                loadingBubble.innerHTML = data.reply.replace(/\*\*(.*?)\*\*/g, '<b class="text-indigo-300">$1</b>').replace(/\n/g, '<br>');
+                history.scrollTop = history.scrollHeight;
+
+            } catch (e) {
+                loadingBubble.textContent = 'Forensic investigation interrupted.';
+                console.error(e);
+            }
+        }
+
+        function appendChatMessage(role, text) {
+            const history = document.getElementById('chat-history');
+            const div = document.createElement('div');
+            const isAI = role === 'ai';
+            
+            div.className = `flex ${isAI ? 'justify-start' : 'justify-end'} animate-in fade-in slide-in-from-${isAI ? 'left' : 'right'}-4 duration-300 mb-4`;
+            
+            div.innerHTML = `
+                <div class="max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
+                    isAI ? 'bg-indigo-900/40 border border-indigo-500/20 text-slate-200' : 'bg-slate-800 border border-slate-700 text-slate-300'
+                }">
+                    ${isAI ? `<div class="flex items-center gap-2 mb-1"><i class="fa-solid fa-microchip text-[10px] text-indigo-400"></i><span class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Aegis Intelligence</span></div>` : ''}
+                    <div>${text.replace(/\*\*(.*?)\*\*/g, '<b class="text-indigo-300">$1</b>').replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+            
+            history.appendChild(div);
+            history.scrollTop = history.scrollHeight;
+            return div.querySelector('div div:last-child');
+        }
+
+        function typeWriter(id, text, speed) {
+            let i = 0;
+            const el = document.getElementById(id);
+            el.innerHTML = '';
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
         }
 
         function formatJSON(obj) {
@@ -983,8 +1182,8 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-[#1e2937] transition-colors cursor-pointer group";
                     tr.onclick = (e) => {
-                        if (e.target.type === 'checkbox' || e.target.closest('.checkbox-cell')) return;
-                        showDeepAnalysisModal(a.id);
+                        if (e.target.type === 'checkbox' || e.target.closest('.checkbox-cell') || e.target.closest('.preview-trigger')) return;
+                        showQuickPreview(a.id);
                     };
                     tr.innerHTML = `
                 <td class="px-6 py-3 border-none flex mt-1 items-center justify-center checkbox-cell">
@@ -996,11 +1195,16 @@
                 <td class="px-4 py-3 border-none"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${sCol}">${a.severity.toUpperCase()}</span></td>
                 <td class="px-4 py-3 border-none text-slate-400 text-xs">${a.category}</td>
                 <td class="px-4 py-3 border-none text-slate-200 truncate max-w-[250px] group-hover:text-cyan-400 transition-colors" title="${a.summary}">${a.summary}</td>
-                <td class="px-6 py-3 border-none flex items-center justify-end gap-2">
-                    <span class="inline-block w-20 h-1.5 rounded-full bg-slate-800 overflow-hidden relative">
-                        <span class="absolute top-0 left-0 h-full" style="width: ${rt}%; background: ${rColor}; box-shadow: 0 0 10px ${rColor}"></span>
-                    </span>
-                    <span class="text-xs w-6 text-right font-mono" style="color: ${rColor}">${rt}</span>
+                <td class="px-6 py-3 border-none flex items-center justify-end gap-3">
+                    <button onclick="showQuickPreview('${a.id}')" class="preview-trigger w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all flex items-center justify-center shadow-lg shadow-cyan-500/5 group/pv" title="Quick Forensic Preview">
+                        <i class="fa-solid fa-eye group-hover/pv:scale-110 transition-transform"></i>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-16 h-1.5 rounded-full bg-slate-800 overflow-hidden relative">
+                            <span class="absolute top-0 left-0 h-full" style="width: ${rt}%; background: ${rColor}; box-shadow: 0 0 10px ${rColor}"></span>
+                        </span>
+                        <span class="text-xs w-6 text-right font-mono" style="color: ${rColor}">${rt}</span>
+                    </div>
                 </td>
             `;
                     tb.appendChild(tr);
@@ -1236,6 +1440,62 @@
                     }
                 }
             };
+        }
+
+        let currentlySelectedAlertForPreview = null;
+
+        function toggleQuickPreview() {
+            const overlay = document.getElementById('quick-preview-overlay');
+            if (overlay) overlay.classList.toggle('hidden');
+        }
+
+        async function showQuickPreview(alertId) {
+            const alert = allAlerts.find(a => String(a.id) === String(alertId));
+            if (!alert) return;
+            
+            currentlySelectedAlertForPreview = alert;
+            const overlay = document.getElementById('quick-preview-overlay');
+            overlay.classList.remove('hidden');
+            
+            // Populate Preview Section
+            document.getElementById('preview-summary').textContent = alert.summary;
+            document.getElementById('preview-meta').textContent = `ID: #${alert.id} • ${alert.timestamp}`;
+            document.getElementById('preview-ip').textContent = alert.source_ip || alert.source_os;
+            document.getElementById('preview-risk').textContent = `${alert.risk_score || 0}/100`;
+            
+            const severityEl = document.getElementById('preview-severity');
+            severityEl.textContent = alert.severity.toUpperCase();
+            severityEl.className = `text-[10px] font-bold uppercase flex items-center gap-1.5 ${
+                alert.severity === 'Critical' ? 'text-red-500' : 
+                alert.severity === 'High' ? 'text-orange-500' : 'text-emerald-500'
+            }`;
+            severityEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${alert.severity.toUpperCase()}`;
+            
+            const headersEl = document.getElementById('preview-headers');
+            if (alert.raw_headers) {
+                headersEl.innerHTML = formatJSON(alert.raw_headers);
+            } else {
+                headersEl.textContent = 'No raw forensic metadata available for this incident.';
+            }
+        }
+
+        function copyRawHeaders() {
+            if (!currentlySelectedAlertForPreview || !currentlySelectedAlertForPreview.raw_headers) return;
+            const text = JSON.stringify(currentlySelectedAlertForPreview.raw_headers, null, 4);
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('button[onclick="copyRawHeaders()"]');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
+                btn.classList.add('text-cyan-400');
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.classList.remove('text-cyan-400');
+                }, 2000);
+            });
+        }
+
+        function downloadReport() {
+            if (currentlySelectedAlertForPreview) downloadRawJSON(currentlySelectedAlertForPreview.id);
         }
 
         window.onload = () => {
