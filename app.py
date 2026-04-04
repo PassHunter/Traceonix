@@ -15,6 +15,7 @@ from contextlib import asynccontextmanager
 
 from log_parser import load_all_logs
 from classifier import classify_all, classify_single, get_stats
+from intelligence import aegis_ai
 from datetime import datetime
 
 # ─────────────────────────────────────────────────────────────
@@ -26,6 +27,7 @@ print("═" * 60 + "\n")
 
 ALL_ALERTS = []
 STATS = {}
+CHAT_SESSIONS = {}  # Per-alert chat history: {alert_id: [history_items]}
 PROCESSING_DONE = True  # Setup for realtime processing
 IS_PROCESSING = False
 
@@ -176,18 +178,60 @@ async def get_alerts(
         "processing_done": PROCESSING_DONE
     }
 
-@app.get("/api/stats")
-async def get_dashboard_stats():
-    """Return aggregate dashboard statistics."""
-    return STATS
-
-@app.get("/api/alerts/critical")
-async def get_critical_alerts():
-    """Return only High and Critical alerts for AegisCore overlay."""
-    critical = [a for a in ALL_ALERTS if a["severity"] in ("Critical", "High")]
     return {
         "total": len(critical),
         "alerts": critical[:50],  # Top 50 most severe
+    }
+
+@app.get("/api/ai/analyze/{alert_id}")
+async def analyze_alert_ai(alert_id: int):
+    """Perform deep Gemini AI forensic analysis on a specific alert."""
+    # Find alert in ALL_ALERTS
+    alert = next((a for a in ALL_ALERTS if a["id"] == alert_id), None)
+    
+    if not alert:
+        return JSONResponse(status_code=404, content={"message": "Alert not found"})
+        
+    # Get initial analysis from Gemini
+    analysis_text = await aegis_ai.get_initial_forensic_explanation(alert)
+    
+    # Initialize/Reset session for this alert (OpenRouter/OpenAI format)
+    CHAT_SESSIONS[alert_id] = [
+        {"role": "user", "content": f"Analyze this alert: {json.dumps(alert)}"},
+        {"role": "assistant", "content": analysis_text}
+    ]
+    
+    return {
+        "alert_id": alert_id,
+        "analysis": analysis_text,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+@app.post("/api/ai/chat/{alert_id}")
+async def chat_with_ai_endpoint(alert_id: int, request: Request):
+    """Continue forensic investigation via interactive chat (OpenRouter)."""
+    data = await request.json()
+    user_message = data.get("message")
+    
+    if not user_message:
+        return JSONResponse(status_code=400, content={"message": "Message required"})
+        
+    history = CHAT_SESSIONS.get(alert_id, [])
+    
+    # Get response from OpenRouter
+    response_text = await aegis_ai.continue_investigation(alert_id, user_message, history)
+    
+    # Persist in history
+    if alert_id not in CHAT_SESSIONS:
+        CHAT_SESSIONS[alert_id] = []
+        
+    CHAT_SESSIONS[alert_id].append({"role": "user", "content": user_message})
+    CHAT_SESSIONS[alert_id].append({"role": "assistant", "content": response_text})
+    
+    return {
+        "alert_id": alert_id,
+        "reply": response_text,
+        "history_count": len(CHAT_SESSIONS[alert_id])
     }
 
 
