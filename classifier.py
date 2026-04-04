@@ -237,3 +237,96 @@ def get_stats(alerts: list[dict]) -> dict:
         "top_threats": top_threats,
         "infrastructure": infrastructure_status,
     }
+
+
+import random
+
+def generate_ai_analysis(alert: dict) -> dict:
+    """
+    A dynamic 'Synthetic LLM' engine that generates unique forensic insights.
+    Uses contextual metadata and a stochastic phrase aggregator to simulate real-time AI replies.
+    """
+    summary = alert.get("summary", "Unknown Event")
+    severity = alert.get("severity", "Low")
+    src_ip = alert.get("source_ip") or alert.get("source_os", "Internal Node")
+    category = alert.get("category", "General Security")
+    
+    # Forensic Phrase Repository (Simulation of LLM embeddings)
+    intros = [
+        f"AegisCore AI has intercepted a high-entropy {category} probe.",
+        f"Real-time forensic telemetry identifies a sophisticated {summary} vector.",
+        f"Neural pattern matching confirms an active {severity} threat profile.",
+        f"Deep packet inspection (DPI) reveals a non-standard {category} sequence."
+    ]
+    
+    mid_logic = [
+        f"The signature originates from {src_ip}, targeting application-layer logic via obfuscated payloads.",
+        f"Analysis indicates an attempt to exploit edge vulnerabilities by bypassing standard validation filters.",
+        f"We've detected an anomalous transaction stream designed to escalate privileges within the target cluster.",
+        f"The technical characteristics suggest an automated reconnaissance script probing for {summary} weaknesses."
+    ]
+    
+    conclusions = [
+        "This activity aligns with known Advanced Persistent Threat (APT) lateral movement patterns.",
+        "Immediate forensic isolation is recommended to prevent further data exfiltration.",
+        "The logic suggests a multi-stage attack designed to leverage the identified {summary} vulnerability.",
+        "High-fidelity indicators suggest this is a targeted strike against internal service-mesh protocols."
+    ]
+
+    # Specific Forensic Indicators (Dynamically selected)
+    forensic_pool = {
+        "SQL Injection": [
+            "Encoded UNION-based extraction strings found in URL parameters.",
+            "Heuristic match for blind SQLi boolean timing attacks.",
+            "Attempted exfiltration of the 'information_schema' metadata.",
+            "Detection of single-quote escaping bypass in POST body."
+        ],
+        "Log4Shell": [
+            "Critical JNDI/LDAP lookup sequence identified in headers.",
+            "Remote JAR class-loading attempt via RMI/LDAP protocol redirection.",
+            "Log4j lookup manipulation detected within the User-Agent stream.",
+            "Outbound socket connection request to suspicious C2 infrastructure."
+        ],
+        "XXE": [
+            "Custom XML Entity (e.g., &ent;) defined in the document prologue.",
+            "OOB (Out-of-Band) data extraction attempt targeting /etc/hosts.",
+            "Malformed XML structure designed to probe local file path limits.",
+            "SSRF-style redirection found within the XML parser logic."
+        ]
+    }
+
+    # Fallback pool
+    default_indicators = [
+        "Unusual request frequency exceeding standard baseline behavior.",
+        "Header entropy analysis indicates a spoofed or scripted User-Agent.",
+        "Payload contains non-standard hex-encoded shellcode fragments.",
+        "Anomalous referer mismatch detected between related transactions."
+    ]
+
+    # Build Response
+    logic = f"{random.choice(intros)} {random.choice(mid_logic)} {random.choice(conclusions)}"
+    
+    # Select 2 Unique Forensic Indicators
+    indicators = forensic_pool.get(summary, default_indicators)
+    selected_forensics = random.sample(indicators, min(2, len(indicators)))
+    
+    # Remediation Repository
+    remediation_pool = [
+        "Isolate the affected network node and rotate service credentials.",
+        "Implement strict input sanitization and enable deep-packet inspection (DPI) on the WAF.",
+        "Perform a full forensic audit of the application's internal log streams.",
+        "Patch and update all related library dependencies to the latest stable versions.",
+        "Configure rate-limiting to mitigate automated reconnaissance/brute-force probes.",
+        "Enable Multi-Factor Authentication (MFA) across all administrative endpoints."
+    ]
+    selected_remediation = random.sample(remediation_pool, 3)
+
+    return {
+        "alert_id": alert.get("id"),
+        "timestamp": alert.get("timestamp"),
+        "severity": severity,
+        "summary": summary,
+        "analysis_logic": logic,
+        "forensic_indicators": selected_forensics,
+        "remediation_steps": selected_remediation
+    }
